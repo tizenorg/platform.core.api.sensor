@@ -1,3 +1,19 @@
+capi-system-sensor (0.1.0-8) unstable; urgency=low
+
+  * fix sensor_get_spec for light and proximity (lux, centimeter)
+  * Git: api/sensor
+  * Tag: capi-system-sensor_0.1.0-8
+
+ -- pius lee <pius.lee@samsung.com>  Thu, 09 Feb 2012 16:01:52 +0900
+
+capi-system-sensor (0.1.0-7) unstable; urgency=low
+
+  * light and proximity sensor modified. sensor will be measured lux and centimeter.
+  * Git: api/sensor
+  * Tag: capi-system-sensor_0.1.0-7
+
+ -- pius lee <pius.lee@samsung.com>  Thu, 02 Feb 2012 18:50:31 +0900
+
 capi-system-sensor (0.1.0-6) unstable; urgency=low
 
   * fix bug for calibration callback's invalidate user data

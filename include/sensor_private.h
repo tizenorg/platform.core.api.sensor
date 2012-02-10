@@ -17,8 +17,8 @@
 
 
 
-#ifndef __TIZEN_SYSTEM_SENSOR_PRIVATE_H__
-#define __TIZEN_SYSTEM_SENSOR_PRIVATE_H__
+#ifndef __SENSOR_PRIVATE_H__
+#define __SENSOR_PRIVATE_H__
 
 #ifdef __cplusplus
 extern "C"
@@ -103,4 +103,4 @@ struct sensor_handle_s {
 }
 #endif
 
-#endif // __TIZEN_SYSTEM_SENSOR_PRIVATE_H__ 
+#endif // __SENSOR_PRIVATE_H__ 

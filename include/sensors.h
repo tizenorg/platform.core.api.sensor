@@ -17,8 +17,8 @@
 
 
 
-#ifndef __TIZEN_SYSTEM_SENSOR_H__
-#define __TIZEN_SYSTEM_SENSOR_H__
+#ifndef __SENSOR_H__
+#define __SENSOR_H__
 
 #include <tizen_error.h>
 #include <tizen_type.h>
@@ -191,12 +191,8 @@ typedef void (*sensor_accelerometer_event_cb)(
  * @brief Called when a gyroscope event occurs.
  *
  * @remark
- * All values are in radians/second and measure the rate of rotation around the X, Y and Z axis. \n
- * The coordinate system is the same as is used for the acceleration sensor. Rotation is positive \n
- * in the counter-clockwise direction. That is, an observer looking from some positive location \n
- * on the @a x, @a y, or @a z axis at a device positioned on the origin would report positive rotation if \n
- * the device appeared to be rotating counter clockwise. Note that this is the standard mathematical \n
- * definition of positive rotation and does not agree with the definition of roll given earlier.
+ * Measure the rate of rotation around X, Y and Z axis in radians/second values.
+ * All values is observed by positive value in the counter-clockwise direction.
  *
  * @param[in] accuracy      The accuracy of @a x, @a y, and @a z values
  * @param[in] x             Angular speed around the x-axis in degree per second
@@ -222,22 +218,19 @@ typedef void (*sensor_gyroscope_event_cb)(
  * @brief Called when a light event occurs.
  *
  * @remark
- * All values are neither SI lux units (lx), nor adc.\n
- * Values returned by sensor may vary depending on a hardware. In the case of some\n
- * HW, level 1 can mean 1 ~ 100 lux, while in some other case, level 1 can mean 1~50 lux.\n
- * You should use light level between min and max values obtained \n
- * with #sensor_get_spec(). In most cases min is 1 and max is 10.
+ * You should use lux between min and max values obtained \n
+ * with #sensor_get_spec().
  *
  * @param[in] accuracy      The accuracy of @a level, @a y, and @a z values
- * @param[in] level         Actual light level
- * @param[in] level         Ambient light level between min and max values obtained with #sensor_get_spec().\n
+ * @param[in] lux           The ambient light level in SI lux units \n
+ *			@a lux is between min and max values obtained with #sensor_get_spec().\n
  * @param[in] user_data     The user data passed from the callback registration function
  * @pre sensor_start() will invoke this callback if you register this callback using sensor_light_set_cb().
  * @see sensor_light_set_cb()
  * @see sensor_light_unset_cb()
  */
 typedef void (*sensor_light_event_cb)(
-		sensor_data_accuracy_e accuracy, int level, void *user_data);
+		sensor_data_accuracy_e accuracy, float lux, void *user_data);
 /**
  * @}
  */
@@ -303,13 +296,13 @@ typedef void (*sensor_orientation_event_cb)(
 /**
  * @brief Called when a proximity event occurs.
  *
- * @param[out]  is_near     @c true if an object is close to the phone, otherwise @c false
- * @param[in] user_data     The user data passed from the callback registration function
+ * @param[in]  distance       The distance measured in centemeters
+ * @param[in]   user_data     The user data passed from the callback registration function
  * @pre sensor_start() will invoke this callback if you register this callback using sensor_proximity_set_cb().
  * @see sensor_proximity_set_cb()
  * @see sensor_proximity_unset_cb()
  */
-typedef void (*sensor_proximity_event_cb)(bool is_near, void *user_data);
+typedef void (*sensor_proximity_event_cb)(sensor_data_accuracy_e accuracy, float distance, void *user_data);
 /**
  * @}
  */
@@ -720,16 +713,13 @@ int sensor_light_unset_cb(sensor_h sensor);
  * @brief	Gets sensor data from the light sensor.
  *
  * @remark
- * All values are neither SI lux units (lx), nor adc.\n
- * Values returned by sensor may vary depending on a hardware. In some devices,
- * HW level 1 can mean 1 ~ 100 lux, while in others, HW level 1 can mean 1 ~ 50 lux.\n
- * You should use light level between min and max values obtained \n
- * with #sensor_get_spec(). In most cases min is 1 and max is 10.
+ * You should use lux between min and max values obtained \n
+ * with #sensor_get_spec().
  *
  * @param[in]   sensor      The sensor handle
  * @param[out]  accuracy    The accuracy of this data
- * @param[out]  level       The ambient light level in SI lux units \n
- *			@a level is between min and max values obtained with #sensor_get_spec().\n
+ * @param[out]  lux       The ambient light level in SI lux units \n
+ *			@a lux is between min and max values obtained with #sensor_get_spec().\n
  *
  * @return      0 on success, otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                  Successful
@@ -739,7 +729,7 @@ int sensor_light_unset_cb(sensor_h sensor);
  * @see #sensor_data_accuracy_e
  * @see sensor_start()
  */
-int sensor_light_read_data(sensor_h sensor, sensor_data_accuracy_e *accuracy, int *level);
+int sensor_light_read_data(sensor_h sensor, sensor_data_accuracy_e *accuracy, float *lux);
 
 /**
  * @}
@@ -960,6 +950,7 @@ int sensor_orientation_read_data(sensor_h sensor, sensor_data_accuracy_e *accura
  * @brief	Registers a callback function to be invoked when a proximity event occurs.
  *
  * @param[in]   sensor      The sensor handle
+ * @param[in]   interval_ms	The interval sensor events are delivered in (in milliseconds) \n
  * @param[in]   callback    The callback function to register
  * @param[in]   user_data   The user data to be passed to the callback function
  *
@@ -974,7 +965,7 @@ int sensor_orientation_read_data(sensor_h sensor, sensor_data_accuracy_e *accura
  * @see sensor_proximity_event_cb()
  * @see sensor_proximity_unset_cb()
  */
-int sensor_proximity_set_cb(sensor_h sensor, sensor_proximity_event_cb callback, void *user_data);
+int sensor_proximity_set_cb(sensor_h sensor, int interval_ms, sensor_proximity_event_cb callback, void *user_data);
 
 /**
  * @brief	Unregister the proximity callback function.
@@ -991,6 +982,25 @@ int sensor_proximity_set_cb(sensor_h sensor, sensor_proximity_event_cb callback,
  */
 int sensor_proximity_unset_cb(sensor_h sensor);
 
+/**
+ * @brief Gets sensor data from the Proximity sensor.
+ *
+ * @remark
+ * All values are angles in degrees.
+ *
+ * @param[in]   sensor      The sensor handle
+ * @param[out]  accuracy    The accuracy of this data
+ * @param[out]  distance    The distance measured in centemeters
+ *
+ * @return      0 on success, otherwise a negative error value
+ * @retval      #SENSOR_ERROR_NONE                  Successful
+ * @retval      #SENSOR_ERROR_INVALID_PARAMETER     Invalid parameter
+ * @retval      #SENSOR_ERROR_IO_ERROR				I/O error
+ *
+ * @pre In order to read sensor data, an application should call sensor_start().
+ * @see sensor_start()
+ */
+int sensor_proximity_read_data(sensor_h sensor, sensor_data_accuracy_e *accuracy, float *distance);
 /**
  * @}
  *

@@ -124,20 +124,25 @@ sensor_type_t _TYPE[] = {
 
 int _DTYPE[] = {
 	ACCELEROMETER_BASE_DATA_SET,
-	GEOMAGNETIC_RAW_DATA_SET, // really magnetic?
-	GEOMAGNETIC_BASE_DATA_SET, // really orientation?
+	GEOMAGNETIC_RAW_DATA_SET,
+	GEOMAGNETIC_BASE_DATA_SET,
 	GYRO_BASE_DATA_SET,
-	LIGHT_BASE_DATA_SET,
-	PROXIMITY_BASE_DATA_SET,
+	LIGHT_LUX_DATA_SET,
+	PROXIMITY_DISTANCE_DATA_SET,
+	MOTION_SENSOR,
+	MOTION_SENSOR,
+	MOTION_SENSOR,
+	MOTION_SENSOR,
+	MOTION_SENSOR,
 };
 
 int _EVENT[] = {
 	ACCELEROMETER_EVENT_RAW_DATA_REPORT_ON_TIME,
-	GEOMAGNETIC_EVENT_RAW_DATA_REPORT_ON_TIME, // really magnetic?
-	GEOMAGNETIC_EVENT_ATTITUDE_DATA_REPORT_ON_TIME, // really orientation?
+	GEOMAGNETIC_EVENT_RAW_DATA_REPORT_ON_TIME, 
+	GEOMAGNETIC_EVENT_ATTITUDE_DATA_REPORT_ON_TIME,
 	GYROSCOPE_EVENT_RAW_DATA_REPORT_ON_TIME,
-	LIGHT_EVENT_LEVEL_DATA_REPORT_ON_TIME, // rate = 500ms
-    PROXIMITY_EVENT_CHANGE_STATE,
+	LIGHT_EVENT_LUX_DATA_REPORT_ON_TIME, 
+    PROXIMITY_EVENT_DISTANCE_DATA_REPORT_ON_TIME,
 	MOTION_ENGINE_EVENT_SNAP,
 	MOTION_ENGINE_EVENT_SHAKE,
 	MOTION_ENGINE_EVENT_DOUBLETAP,
@@ -200,7 +205,7 @@ static void _sensor_callback (unsigned int event_type, sensor_event_data_t* even
     sensor_panning_data_t *panning_data = NULL;
 	int motion = 0;
     int nid = 0;
-    bool proximity = 0;
+//    bool proximity = 0;
 
 	sensor_h sensor = (sensor_h)udata;
 
@@ -233,10 +238,10 @@ static void _sensor_callback (unsigned int event_type, sensor_event_data_t* even
 		case GYROSCOPE_EVENT_RAW_DATA_REPORT_ON_TIME :
             nid = SENSOR_GYROSCOPE;
             break;
-		case LIGHT_EVENT_LEVEL_DATA_REPORT_ON_TIME :
+		case LIGHT_EVENT_LUX_DATA_REPORT_ON_TIME :
             nid = SENSOR_LIGHT;
             break;
-		case PROXIMITY_EVENT_CHANGE_STATE :
+		case PROXIMITY_EVENT_DISTANCE_DATA_REPORT_ON_TIME :
             nid = SENSOR_PROXIMITY;
             break;
 	}
@@ -268,13 +273,16 @@ static void _sensor_callback (unsigned int event_type, sensor_event_data_t* even
 		case GEOMAGNETIC_EVENT_RAW_DATA_REPORT_ON_TIME :
 		case GEOMAGNETIC_EVENT_ATTITUDE_DATA_REPORT_ON_TIME :
 		case GYROSCOPE_EVENT_RAW_DATA_REPORT_ON_TIME :
-		case LIGHT_EVENT_LEVEL_DATA_REPORT_ON_TIME :
+		case LIGHT_EVENT_LUX_DATA_REPORT_ON_TIME :
+        case PROXIMITY_EVENT_DISTANCE_DATA_REPORT_ON_TIME :
 			data = (sensor_data_t*)(event->event_data);
 			data_num = (event->event_data_size)/sizeof(sensor_data_t);
 			break;
+            /*
 		case PROXIMITY_EVENT_CHANGE_STATE :
             proximity = *(int*)(event->event_data) == PROXIMITY_STATE_FAR ? 0 : 1;
             break;
+            */
 		default:
 			DEBUG_PRINTF("unknown typed sensor happen!! event=%d\n", event_type);
 			return;
@@ -331,17 +339,21 @@ static void _sensor_callback (unsigned int event_type, sensor_event_data_t* even
 					 sensor->cb_user_data[nid]);
 			}
 			break;
-		case LIGHT_EVENT_LEVEL_DATA_REPORT_ON_TIME :
+		case LIGHT_EVENT_LUX_DATA_REPORT_ON_TIME :
 			for(i=0; i<data_num; i++){
 				((sensor_light_event_cb)sensor->cb_func[nid])
 					(_ACCU(data[i].data_accuracy), 
-					 (int)data[i].values[0], 
+					 data[i].values[0], 
 					 sensor->cb_user_data[nid]);
 			}
 			break;
-		case PROXIMITY_EVENT_CHANGE_STATE :
+		case PROXIMITY_EVENT_DISTANCE_DATA_REPORT_ON_TIME :
+			for(i=0; i<data_num; i++){
 				((sensor_proximity_event_cb)sensor->cb_func[nid])
-				    (proximity, sensor->cb_user_data[nid]);
+					(_ACCU(data[i].data_accuracy), 
+					 data[i].values[0], 
+					 sensor->cb_user_data[nid]);
+			}
 			break;
 	}
 }
@@ -363,7 +375,7 @@ int sensor_is_supported(sensor_type_e type, bool* supported)
 
 int sensor_get_spec(sensor_type_e type, float* max, float* min, float* resolution)
 {
-	sensor_properties_t property;
+    sensor_data_properties_t properties;
     
     DEBUG_PRINT("sensor_get_spec");
 
@@ -371,12 +383,12 @@ int sensor_get_spec(sensor_type_e type, float* max, float* min, float* resolutio
 
 	RETURN_IF_NOT_TYPE(type);
 
-	if(sf_get_properties(_TYPE[type], &property) < 0)
+    if(sf_get_data_properties(_DTYPE[type], &properties) < 0)
         RETURN_ERROR(SENSOR_ERROR_NOT_SUPPORTED);
 
-	*max = property.sensor_max_range;
-	*min = property.sensor_min_range;
-	*resolution = property.sensor_resolution;
+	*max = properties.sensor_max_range;
+	*min = properties.sensor_min_range;
+	*resolution = properties.sensor_resolution;
 
 	DEBUG_PRINTF("success get %s's format max=%f, min=%f, res=%f\n", TYPE_NAME(type), *max, *min, *resolution);
 
@@ -703,9 +715,9 @@ int sensor_light_unset_cb                      (sensor_h handle)
     return _sensor_unset_data_cb(handle, SENSOR_LIGHT);
 }
 
-int sensor_proximity_set_cb (sensor_h handle, sensor_proximity_event_cb callback, void *user_data)
+int sensor_proximity_set_cb (sensor_h handle, int interval_ms, sensor_proximity_event_cb callback, void *user_data)
 {
-	return _sensor_set_data_cb(handle, SENSOR_PROXIMITY, 0, (void*) callback, user_data);
+	return _sensor_set_data_cb(handle, SENSOR_PROXIMITY, interval_ms, (void*) callback, user_data);
 }
 
 int sensor_proximity_unset_cb                  (sensor_h handle)
@@ -809,30 +821,30 @@ int sensor_gyroscope_read_data     (sensor_h handle, sensor_data_accuracy_e* acc
 	return SENSOR_ERROR_NONE;
 }
 
-int sensor_light_read_data         (sensor_h handle, sensor_data_accuracy_e* accuracy, int* level)
+int sensor_light_read_data         (sensor_h handle, sensor_data_accuracy_e* accuracy, float* lux)
 {
 	float values[1] = {0};
 	int err = _sensor_read_data(handle, SENSOR_LIGHT, accuracy, values, 1);
     if(err < 0) return err;
 
-    if(level == NULL)
+    if(lux == NULL)
         RETURN_ERROR(SENSOR_ERROR_INVALID_PARAMETER);
 
-    *level = (int)values[0];
+    *lux = values[0];
 
 	return SENSOR_ERROR_NONE;
 }
 
-int sensor_proximity_read_data     (sensor_h handle, sensor_data_accuracy_e* accuracy, bool* is_near)
+int sensor_proximity_read_data     (sensor_h handle, sensor_data_accuracy_e* accuracy, float* distance)
 {
 	float values[1] = {0};
     int err = _sensor_read_data(handle, SENSOR_PROXIMITY, accuracy, values, 1);
     if(err < 0) return err;
 
-    if(is_near == NULL)
+    if(distance == NULL)
         RETURN_ERROR(SENSOR_ERROR_INVALID_PARAMETER);
 
-    *is_near = (bool)values[0];
+    *distance = values[0];
 
 	return SENSOR_ERROR_NONE;
 }
