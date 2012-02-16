@@ -1,3 +1,11 @@
+capi-system-sensor (0.1.0-9) unstable; urgency=low
+
+  * now, version will be attached to shared object extension.
+  * Git: api/sensor
+  * Tag: capi-system-sensor_0.1.0-9
+
+ -- pius lee <pius.lee@samsung.com>  Thu, 16 Feb 2012 17:25:49 +0900
+
 capi-system-sensor (0.1.0-8) unstable; urgency=low
 
   * fix sensor_get_spec for light and proximity (lux, centimeter)
