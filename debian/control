@@ -7,7 +7,7 @@ Build-Depends: debhelper (>= 5), dlog-dev, libslp-sensor-dev, capi-base-common-d
 
 Package: capi-system-sensor
 Architecture: any
-Depends: ${shilbs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: A Sensor library in Tizen Native API
 
 Package: capi-system-sensor-dev
