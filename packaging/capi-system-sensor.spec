@@ -5,6 +5,7 @@ Release:    9
 Group:      TO_BE/FILLED_IN
 License:    Apache-2.0
 Source0:    %{name}-%{version}.tar.gz
+Source1001: packaging/capi-system-sensor.manifest 
 BuildRequires:  cmake
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(sensor)
@@ -29,6 +30,7 @@ Requires: %{name} = %{version}-%{release}
 
 
 %build
+cp %{SOURCE1001} .
 MAJORVER=`echo %{version} | awk 'BEGIN {FS="."}{print $1}'`
 cmake . -DCMAKE_INSTALL_PREFIX=/usr -DFULLVER=%{version} -DMAJORVER=${MAJORVER}
 
@@ -45,9 +47,11 @@ rm -rf %{buildroot}
 
 
 %files
+%manifest capi-system-sensor.manifest
 %{_libdir}/libcapi-system-sensor.so.*
 
 %files devel
+%manifest capi-system-sensor.manifest
 %{_includedir}/system/sensors.h
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/libcapi-system-sensor.so
