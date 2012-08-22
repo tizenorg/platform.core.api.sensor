@@ -19,6 +19,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 
 #include <sensor.h>
 #include <sensor_accel.h>
@@ -99,6 +100,8 @@ static char* _DONT_USE_THIS_ARRAY_DIRECTLY[] = {
 
 #define RETURN_IF_ERROR(val) \
 	RETURN_VAL_IF(val < 0, val)
+
+#define MICROSECONDS(tv)        ((tv.tv_sec * 1000000ll) + tv.tv_usec)
 
 sensor_data_accuracy_e _accu_table[] = {
 	SENSOR_ACCURACY_UNDEFINED,
@@ -205,6 +208,9 @@ static void _sensor_callback (unsigned int event_type, sensor_event_data_t* even
     sensor_panning_data_t *panning_data = NULL;
 	int motion = 0;
     int nid = 0;
+
+	struct timeval sv;
+	unsigned long long motion_time_stamp = 0;
 //    bool proximity = 0;
 
 	sensor_h sensor = (sensor_h)udata;
@@ -292,25 +298,34 @@ static void _sensor_callback (unsigned int event_type, sensor_event_data_t* even
 	switch(event_type)
 	{
 		case MOTION_ENGINE_EVENT_SNAP:
-			((sensor_motion_snap_event_cb)sensor->cb_func[nid])(motion, sensor->cb_user_data[nid]);
+			gettimeofday(&sv, NULL);
+			motion_time_stamp = MICROSECONDS(sv);
+			((sensor_motion_snap_event_cb)sensor->cb_func[nid])(motion_time_stamp, motion, sensor->cb_user_data[nid]);
 			break;
 		case MOTION_ENGINE_EVENT_SHAKE:
-			((sensor_motion_shake_event_cb)sensor->cb_func[nid])(motion, sensor->cb_user_data[nid]);
+			gettimeofday(&sv, NULL);
+			motion_time_stamp = MICROSECONDS(sv);
+			((sensor_motion_shake_event_cb)sensor->cb_func[nid])(motion_time_stamp,motion, sensor->cb_user_data[nid]);
 			break;
 		case MOTION_ENGINE_EVENT_DOUBLETAP:
-			((sensor_motion_doubletap_event_cb)sensor->cb_func[nid])(sensor->cb_user_data[nid]);
+			gettimeofday(&sv, NULL);
+			motion_time_stamp = MICROSECONDS(sv);
+			((sensor_motion_doubletap_event_cb)sensor->cb_func[nid])(motion_time_stamp,sensor->cb_user_data[nid]);
 			break;
 		case MOTION_ENGINE_EVENT_TOP_TO_BOTTOM:
-			((sensor_motion_facedown_event_cb)sensor->cb_func[nid])(sensor->cb_user_data[nid]);
+			gettimeofday(&sv, NULL);
+			motion_time_stamp = MICROSECONDS(sv);
+			((sensor_motion_facedown_event_cb)sensor->cb_func[nid])(motion_time_stamp,sensor->cb_user_data[nid]);
 			break;
 		case MOTION_ENGINE_EVENT_PANNING:
-			((sensor_motion_panning_event_cb)sensor->cb_func[nid])(panning_data->x, panning_data->y, 
-                sensor->cb_user_data[nid]);
+			gettimeofday(&sv, NULL);
+			motion_time_stamp = MICROSECONDS(sv);
+			((sensor_motion_panning_event_cb)sensor->cb_func[nid])(motion_time_stamp,panning_data->x, panning_data->y, sensor->cb_user_data[nid]);
             break;
 		case ACCELEROMETER_EVENT_RAW_DATA_REPORT_ON_TIME :
 			for(i=0; i<data_num; i++){
 				((sensor_accelerometer_event_cb)sensor->cb_func[nid])
-					(_ACCU(data[i].data_accuracy), 
+					(data[i].time_stamp, _ACCU(data[i].data_accuracy), 
 					 data[i].values[0],  data[i].values[1], data[i].values[2], 
 					 sensor->cb_user_data[nid]);
 			}
@@ -318,7 +333,7 @@ static void _sensor_callback (unsigned int event_type, sensor_event_data_t* even
 		case GEOMAGNETIC_EVENT_RAW_DATA_REPORT_ON_TIME :
 			for(i=0; i<data_num; i++){
 				((sensor_magnetic_event_cb)sensor->cb_func[nid])
-					(_ACCU(data[i].data_accuracy), 
+					(data[i].time_stamp,_ACCU(data[i].data_accuracy), 
 					 data[i].values[0],  data[i].values[1], data[i].values[2], 
 					 sensor->cb_user_data[nid]);
 			}
@@ -326,7 +341,7 @@ static void _sensor_callback (unsigned int event_type, sensor_event_data_t* even
 		case GEOMAGNETIC_EVENT_ATTITUDE_DATA_REPORT_ON_TIME :
 			for(i=0; i<data_num; i++){
 				((sensor_orientation_event_cb)sensor->cb_func[nid])
-					(_ACCU(data[i].data_accuracy), 
+					(data[i].time_stamp,_ACCU(data[i].data_accuracy), 
 					 data[i].values[0],  data[i].values[1], data[i].values[2], 
 					 sensor->cb_user_data[nid]);
 			}
@@ -334,7 +349,7 @@ static void _sensor_callback (unsigned int event_type, sensor_event_data_t* even
 		case GYROSCOPE_EVENT_RAW_DATA_REPORT_ON_TIME :
 			for(i=0; i<data_num; i++){
 				((sensor_gyroscope_event_cb)sensor->cb_func[nid])
-					(_ACCU(data[i].data_accuracy), 
+					(data[i].time_stamp,_ACCU(data[i].data_accuracy), 
 					 data[i].values[0],  data[i].values[1], data[i].values[2], 
 					 sensor->cb_user_data[nid]);
 			}
@@ -342,7 +357,7 @@ static void _sensor_callback (unsigned int event_type, sensor_event_data_t* even
 		case LIGHT_EVENT_LUX_DATA_REPORT_ON_TIME :
 			for(i=0; i<data_num; i++){
 				((sensor_light_event_cb)sensor->cb_func[nid])
-					(_ACCU(data[i].data_accuracy), 
+					(data[i].time_stamp, 
 					 data[i].values[0], 
 					 sensor->cb_user_data[nid]);
 			}
@@ -350,7 +365,7 @@ static void _sensor_callback (unsigned int event_type, sensor_event_data_t* even
 		case PROXIMITY_EVENT_DISTANCE_DATA_REPORT_ON_TIME :
 			for(i=0; i<data_num; i++){
 				((sensor_proximity_event_cb)sensor->cb_func[nid])
-					(_ACCU(data[i].data_accuracy), 
+					(data[i].time_stamp, 
 					 data[i].values[0], 
 					 sensor->cb_user_data[nid]);
 			}
@@ -373,22 +388,31 @@ int sensor_is_supported(sensor_type_e type, bool* supported)
     return SENSOR_ERROR_NONE;
 }
 
-int sensor_get_spec(sensor_type_e type, float* max, float* min, float* resolution)
+int sensor_get_spec(sensor_type_e type, char** vendor, char** model, float* max, float* min, float* resolution)
 {
-    sensor_data_properties_t properties;
-    
+    sensor_data_properties_t data_properties;
+	sensor_properties_t properties;
+
     DEBUG_PRINT("sensor_get_spec");
 
     RETURN_IF_MOTION_TYPE(type); 
 
 	RETURN_IF_NOT_TYPE(type);
 
-    if(sf_get_data_properties(_DTYPE[type], &properties) < 0)
+    if(sf_get_data_properties(_DTYPE[type], &data_properties) < 0)
         RETURN_ERROR(SENSOR_ERROR_NOT_SUPPORTED);
 
-	*max = properties.sensor_max_range;
-	*min = properties.sensor_min_range;
-	*resolution = properties.sensor_resolution;
+	if(sf_get_properties(_TYPE[type], &properties) < 0)
+        RETURN_ERROR(SENSOR_ERROR_NOT_SUPPORTED);
+
+	if(vendor != NULL)
+		*vendor = properties.sensor_vendor;
+	if(model != NULL)
+		*model = properties.sensor_name;
+
+	*max = data_properties.sensor_max_range;
+	*min = data_properties.sensor_min_range;
+	*resolution = data_properties.sensor_resolution;
 
 	DEBUG_PRINTF("success get %s's format max=%f, min=%f, res=%f\n", TYPE_NAME(type), *max, *min, *resolution);
 
@@ -821,10 +845,10 @@ int sensor_gyroscope_read_data     (sensor_h handle, sensor_data_accuracy_e* acc
 	return SENSOR_ERROR_NONE;
 }
 
-int sensor_light_read_data         (sensor_h handle, sensor_data_accuracy_e* accuracy, float* lux)
+int sensor_light_read_data         (sensor_h handle, float* lux)
 {
 	float values[1] = {0};
-	int err = _sensor_read_data(handle, SENSOR_LIGHT, accuracy, values, 1);
+	int err = _sensor_read_data(handle, SENSOR_LIGHT, NULL, values, 1);
     if(err < 0) return err;
 
     if(lux == NULL)
@@ -835,10 +859,10 @@ int sensor_light_read_data         (sensor_h handle, sensor_data_accuracy_e* acc
 	return SENSOR_ERROR_NONE;
 }
 
-int sensor_proximity_read_data     (sensor_h handle, sensor_data_accuracy_e* accuracy, float* distance)
+int sensor_proximity_read_data     (sensor_h handle, float* distance)
 {
 	float values[1] = {0};
-    int err = _sensor_read_data(handle, SENSOR_PROXIMITY, accuracy, values, 1);
+    int err = _sensor_read_data(handle, SENSOR_PROXIMITY, NULL, values, 1);
     if(err < 0) return err;
 
     if(distance == NULL)
