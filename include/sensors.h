@@ -720,7 +720,7 @@ int sensor_device_orientation_set_cb(sensor_h sensor, int interval_ms, sensor_de
 int sensor_device_orientation_unset_cb(sensor_h sensor);
 
 /**
- * @brief change the interval at orientation measurements.
+ * @brief change the interval at device orientation measurements.
  * 
  * @param[in]   sensor          The sensor handle
  * @param[in]   interval_ms     in milliseconds.
@@ -733,7 +733,7 @@ int sensor_device_orientation_unset_cb(sensor_h sensor);
  *
  * @see sensor_device_orientation_set_cb()
  */
-int sensor_orientation_set_interval(sensor_h sensor, int interval_ms);
+int sensor_device_orientation_set_interval(sensor_h sensor, int interval_ms);
 
 /**
  * @brief Gets sensor data from the device orientation sensor.
