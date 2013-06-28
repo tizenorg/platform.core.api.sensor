@@ -5,6 +5,7 @@ Release:    1
 Group:      framework/system
 License:    Apache 2.0
 Source0:    %{name}-%{version}.tar.gz
+Source1001: 	capi-system-sensor.manifest
 BuildRequires:  cmake
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(sensor)
@@ -24,6 +25,7 @@ Requires: %{name} = %{version}-%{release}
 
 %prep
 %setup -q
+cp %{SOURCE1001} .
 
 
 %build
@@ -46,10 +48,11 @@ cp LICENSE %{buildroot}/usr/share/license/%{name}
 
 
 %files
-%manifest capi-system-sensor.manifest
+%manifest %{name}.manifest
 %{_libdir}/libcapi-system-sensor.so.*
 
 %files devel
+%manifest %{name}.manifest
 %{_includedir}/system/sensors.h
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/libcapi-system-sensor.so
