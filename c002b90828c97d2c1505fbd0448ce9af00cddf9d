@@ -1,0 +1,8 @@
+Change-Id: Ic002b90828c97d2c1505fbd0448ce9af00cddf9d
+Code-Review+2: Ryan Ware <ware@linux.intel.com>
+Verified+1: Ryan Ware <ware@linux.intel.com>
+Submitted-by: Ryan Ware <ware@linux.intel.com>
+Submitted-at: Mon, 08 Jul 2013 10:06:23 -0700
+Reviewed-on: https://review.tizen.org/gerrit/4583
+Project: platform/core/api/sensor
+Branch: refs/heads/tizen
