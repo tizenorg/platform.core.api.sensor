@@ -1,6 +1,7 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET(fw_name "capi-system-sensor")
+SET(version "0.1.17")
 
 PROJECT(${fw_name})
 
@@ -52,6 +53,7 @@ INSTALL(
         )
 
 SET(PC_NAME ${fw_name})
+SET(PC_VERSION ${version})
 SET(PC_REQUIRED ${pc_dependents})
 SET(PC_LDFLAGS -l${fw_name})
 
