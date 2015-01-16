@@ -1,15 +1,14 @@
-
 # Package Information for pkg-config
 
 prefix=@PREFIX@
-exec_prefix=/usr
+exec_prefix=@PREFIX@/bin
 libdir=@LIB_INSTALL_DIR@
-includedir=/usr/include/system
+includedir=@INCLUDE_INSTALL_DIR@/sensor
 
-Name: @PC_NAME@
-Description: @PACKAGE_DESCRIPTION@
+Name: capi-system-sensor
+Description: A sensor library
 Version: @VERSION@
-Requires: @PC_REQUIRED@ 
-Libs: -L${libdir} @PC_LDFLAGS@
-Cflags: -I${includedir} 
+Requires: capi-base-common
+Libs: -L${libdir} -lcapi-system-sensor
+Cflags: -I${includedir}
 

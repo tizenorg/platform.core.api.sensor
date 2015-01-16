@@ -1,57 +1,57 @@
 Name:       capi-system-sensor
 Summary:    A Sensor library in TIZEN C API
-Version:    0.1.17
+Version:    0.1.0
 Release:    0
-Group:      framework/system
-License:    Apache-2.0
+Group:      System/API
+License:    Apache 2.0
 Source0:    %{name}-%{version}.tar.gz
-Source1001:     capi-system-sensor.manifest
+Source1:    capi-system-sensor.manifest
+
 BuildRequires:  cmake
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(sensor)
 BuildRequires:  pkgconfig(capi-base-common)
+Requires(post): /sbin/ldconfig
+Requires(postun): /sbin/ldconfig
 
 %description
-%{summary}
+A Sensor Library in TIZEN C API package.
 
 %package devel
 Summary:  A Sensor library in TIZEN C API (Development)
-Group:    framework/system
+Group:    System/Development
 Requires: %{name} = %{version}-%{release}
 
 %description devel
-%{summary}
-
+A Sensor library in TIZEN C API package (Development).
+%devel_desc
 
 %prep
 %setup -q
-cp %{SOURCE1001} .
-
 
 %build
+cp %{SOURCE1} .
 MAJORVER=`echo %{version} | awk 'BEGIN {FS="."}{print $1}'`
-
-%cmake . -DFULLVER=%{version} -DMAJORVER=${MAJORVER} -DVERSION="%{version}"
-
-%__make %{?jobs:-j%jobs}
-
+%cmake . -DFULLVER=%{version} -DMAJORVER=${MAJORVER}
+%__make %{?_smp_mflags}
 
 %install
+rm -rf %{buildroot}
 %make_install
 
 %post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
 
-
 %files
-%manifest %{name}.manifest
-%license LICENSE
+%manifest capi-system-sensor.manifest
 %{_libdir}/libcapi-system-sensor.so.*
+%license LICENSE.APLv2
 
 %files devel
-%manifest %{name}.manifest
-%license LICENSE
-%{_includedir}/system/sensors.h
-%{_libdir}/pkgconfig/*.pc
+%manifest capi-system-sensor.manifest
+%license LICENSE.APLv2
 %{_libdir}/libcapi-system-sensor.so
+%{_libdir}/pkgconfig/*.pc
+%{_includedir}/sensor/*.h
+
