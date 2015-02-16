@@ -298,7 +298,7 @@ int sensor_listener_start(sensor_listener_h listener)
 	if (!sensord_start(id, option))
 		return SENSOR_ERROR_OPERATION_FAILED;
 
-	_E("success sensor_listener_start : id[%d]", id);
+	_D("success sensor_listener_start : id[%d]", id);
 
 	return SENSOR_ERROR_NONE;
 }
@@ -428,7 +428,7 @@ int sensor_listener_set_accuracy_cb(sensor_listener_h listener,
 {
 	int id;
 
-	_E("called sensor_register_accuracy_cb : listener[0x%x], callback[0x%x], user_data[0x%x] cb[%p]",
+	_D("called sensor_register_accuracy_cb : listener[0x%x], callback[0x%x], user_data[0x%x] cb[%p]",
 			listener, callback, data, accuracy_changed_callback);
 
 	if (!listener || !callback)
