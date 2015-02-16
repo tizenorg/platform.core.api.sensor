@@ -46,6 +46,10 @@
  *  - http://tizen.org/feature/sensor.linear_acceleration\n
  *  - http://tizen.org/feature/sensor.rotation_vector\n
  *  - http://tizen.org/feature/sensor.gravity\n
+ *  - http://tizen.org/feature/sensor.heart_rate_monitor\n
+ *  - http://tizen.org/feature/sensor.hrm_led_green\n
+ *  - http://tizen.org/feature/sensor.hrm_led_ir\n
+ *  - http://tizen.org/feature/sensor.hrm_led_red\n
  *
  * It is recommended to design feature related codes in your application for reliability.\n
  *
@@ -80,6 +84,10 @@
  *  - http://tizen.org/feature/sensor.linear_acceleration\n
  *  - http://tizen.org/feature/sensor.rotation_vector\n
  *  - http://tizen.org/feature/sensor.gravity\n
+ *  - http://tizen.org/feature/sensor.heart_rate_monitor\n
+ *  - http://tizen.org/feature/sensor.hrm_led_green\n
+ *  - http://tizen.org/feature/sensor.hrm_led_ir\n
+ *  - http://tizen.org/feature/sensor.hrm_led_red\n
  *
  * It is recommended to design feature related codes in your application for reliability.\n
  *
@@ -113,6 +121,10 @@
  *  - http://tizen.org/feature/sensor.linear_acceleration\n
  *  - http://tizen.org/feature/sensor.rotation_vector\n
  *  - http://tizen.org/feature/sensor.gravity\n
+ *  - http://tizen.org/feature/sensor.heart_rate_monitor\n
+ *  - http://tizen.org/feature/sensor.hrm_led_green\n
+ *  - http://tizen.org/feature/sensor.hrm_led_ir\n
+ *  - http://tizen.org/feature/sensor.hrm_led_red\n
  *
  * It is recommended to design feature related codes in your application for reliability.\n
  *

@@ -134,6 +134,10 @@ typedef enum
 	SENSOR_ULTRAVIOLET,                      /**< Ultraviolet sensor */
 	SENSOR_TEMPERATURE,                      /**< Temperature sensor */
 	SENSOR_HUMIDITY,                         /**< Humidity sensor */
+	SENSOR_HRM,                              /**< Heart Rate Monitor sensor */
+	SENSOR_HRM_LED_GREEN,                    /**< HRM (LED Green) sensor */
+	SENSOR_HRM_LED_IR,                       /**< HRM (LED IR) sensor */
+	SENSOR_HRM_LED_RED,                      /**< HRM (LED RED) sensor */
 	SENSOR_LAST,                             /**< End of sensor enum values */
 	SENSOR_CUSTOM = 10000                    /**< Custom sensor */
 } sensor_type_e;
@@ -156,6 +160,8 @@ typedef enum
  * @brief Checks whether a given sensor type is available on a device.
  * @details Availability of a sensor should be checked first because this sensor may not be supported on the device.
  * @since_tizen 2.3
+ * @remarks For getting a handle of HRM Sensor(including HRM_LED_GREEN, HRM_LED_IR and HRM_LED_RED)
+ * the privilege should be set to, %http://tizen.org/privilege/healthinfo.
  *
  * @param[in]   type        The sensor type to check
  * @param[out]  supported   If @c true this sensor type is supported,
@@ -173,6 +179,8 @@ int sensor_is_supported(sensor_type_e type, bool *supported);
 /**
  * @brief Gets a specific sensor handle.
  * @since_tizen 2.3
+ * @remarks For getting a handle of HRM Sensor(including HRM_LED_GREEN, HRM_LED_IR and HRM_LED_RED)
+ * the privilege should be set to, %http://tizen.org/privilege/healthinfo.
  *
  * @param[in]  type     The sensor type
  * @param[out] sensor   The sensor handle

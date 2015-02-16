@@ -59,6 +59,10 @@ sensor_type_t _TYPE[] = {
 	ULTRAVIOLET_SENSOR,
 	TEMPERATURE_SENSOR,
 	HUMIDITY_SENSOR,
+	BIO_HRM_SENSOR,
+	BIO_LED_GREEN_SENSOR,
+	BIO_LED_IR_SENSOR,
+	BIO_LED_RED_SENSOR,
 };
 
 static int sensor_connect (sensor_h sensor, sensor_listener_h listener)
