@@ -20,7 +20,7 @@
 #include <sys/time.h>
 
 #include <sensor_internal.h>
-#include <sensors.h>
+#include <sensor.h>
 #include <sensor_private.h>
 #include <libgen.h>
 #include <memory>
