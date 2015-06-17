@@ -138,6 +138,9 @@ typedef enum
 	SENSOR_HRM_LED_GREEN,                    /**< HRM (LED Green) sensor */
 	SENSOR_HRM_LED_IR,                       /**< HRM (LED IR) sensor */
 	SENSOR_HRM_LED_RED,                      /**< HRM (LED RED) sensor */
+	SENSOR_UNCAL_GYROSCOPE,                  /**< Uncalibrated Gyroscope sensor */
+	SENSOR_GEOMAGNETIC_RV,                   /**< Geomagnetic Rotation Vector sensor */
+	SENSOR_GAMING_RV,                        /**< Gaming Rotation Vector sensor */
 	SENSOR_LAST,                             /**< End of sensor enum values */
 	SENSOR_CUSTOM = 10000                    /**< Custom sensor */
 } sensor_type_e;

@@ -63,6 +63,9 @@ sensor_type_t _TYPE[] = {
 	BIO_LED_GREEN_SENSOR,
 	BIO_LED_IR_SENSOR,
 	BIO_LED_RED_SENSOR,
+	UNCAL_GYROSCOPE_SENSOR,
+	GEOMAGNETIC_RV_SENSOR,
+	GAMING_RV_SENSOR
 };
 
 static int sensor_connect (sensor_h sensor, sensor_listener_h listener)
