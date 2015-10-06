@@ -47,9 +47,13 @@
  *  - http://tizen.org/feature/sensor.rotation_vector\n
  *  - http://tizen.org/feature/sensor.gravity\n
  *  - http://tizen.org/feature/sensor.heart_rate_monitor\n
- *  - http://tizen.org/feature/sensor.hrm_led_green\n
- *  - http://tizen.org/feature/sensor.hrm_led_ir\n
- *  - http://tizen.org/feature/sensor.hrm_led_red\n
+ *  - http://tizen.org/feature/sensor.heart_rate_monitor.led_green\n
+ *  - http://tizen.org/feature/sensor.heart_rate_monitor.led_ir\n
+ *  - http://tizen.org/feature/sensor.heart_rate_monitor.led_red\n
+ *  - http://tizen.org/feature/sensor.gyroscope.uncalibrated\n
+ *  - http://tizen.org/feature/sensor.magnetometer.uncalibrated\n
+ *  - http://tizen.org/feature/sensor.gyroscope_rotation_vector\n
+ *  - http://tizen.org/feature/sensor.geomagnetic_rotation_vector\n
  *
  * It is recommended to design feature related codes in your application for reliability.\n
  *
@@ -85,9 +89,13 @@
  *  - http://tizen.org/feature/sensor.rotation_vector\n
  *  - http://tizen.org/feature/sensor.gravity\n
  *  - http://tizen.org/feature/sensor.heart_rate_monitor\n
- *  - http://tizen.org/feature/sensor.hrm_led_green\n
- *  - http://tizen.org/feature/sensor.hrm_led_ir\n
- *  - http://tizen.org/feature/sensor.hrm_led_red\n
+ *  - http://tizen.org/feature/sensor.heart_rate_monitor.led_green\n
+ *  - http://tizen.org/feature/sensor.heart_rate_monitor.led_ir\n
+ *  - http://tizen.org/feature/sensor.heart_rate_monitor.led_red\n
+ *  - http://tizen.org/feature/sensor.gyroscope.uncalibrated\n
+ *  - http://tizen.org/feature/sensor.magnetometer.uncalibrated\n
+ *  - http://tizen.org/feature/sensor.gyroscope_rotation_vector\n
+ *  - http://tizen.org/feature/sensor.geomagnetic_rotation_vector\n
  *
  * It is recommended to design feature related codes in your application for reliability.\n
  *
@@ -122,9 +130,13 @@
  *  - http://tizen.org/feature/sensor.rotation_vector\n
  *  - http://tizen.org/feature/sensor.gravity\n
  *  - http://tizen.org/feature/sensor.heart_rate_monitor\n
- *  - http://tizen.org/feature/sensor.hrm_led_green\n
- *  - http://tizen.org/feature/sensor.hrm_led_ir\n
- *  - http://tizen.org/feature/sensor.hrm_led_red\n
+ *  - http://tizen.org/feature/sensor.heart_rate_monitor.led_green\n
+ *  - http://tizen.org/feature/sensor.heart_rate_monitor.led_ir\n
+ *  - http://tizen.org/feature/sensor.heart_rate_monitor.led_red\n
+ *  - http://tizen.org/feature/sensor.gyroscope.uncalibrated\n
+ *  - http://tizen.org/feature/sensor.magnetometer.uncalibrated\n
+ *  - http://tizen.org/feature/sensor.gyroscope_rotation_vector\n
+ *  - http://tizen.org/feature/sensor.geomagnetic_rotation_vector\n
  *
  * It is recommended to design feature related codes in your application for reliability.\n
  *

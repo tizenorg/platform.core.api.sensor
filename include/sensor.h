@@ -45,7 +45,7 @@ extern "C"
 /**
  * @brief The sensor handle.
  * @details This handle indicates a specific sensor itself.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef void* sensor_h;
 
@@ -53,7 +53,7 @@ typedef void* sensor_h;
 /**
  * @brief The listener handle.
  * @details This listener is an event listener used to receive sensor data asynchronously.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef struct sensor_listener_s *sensor_listener_h;
 
@@ -61,7 +61,7 @@ typedef struct sensor_listener_s *sensor_listener_h;
 /**
  * @brief The structure type containing information of an event.
  * @details It holds information such as timestamp, accuracy, and sensor values.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @remarks If you use proximity sensor, see #sensor_proximity_e
  */
@@ -75,7 +75,7 @@ typedef struct
 
 /**
  * @brief Enumeration for sensor data accuracy.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum
 {
@@ -89,7 +89,7 @@ typedef enum
 
 /**
  * @brief Enumeration for sensor error.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum
 {
@@ -105,7 +105,7 @@ typedef enum
 
 /**
  * @brief Enumeration for proximity sensor.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum
 {
@@ -116,7 +116,7 @@ typedef enum
 
 /**
  * @brief Enumeration for sensor types.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum
 {
@@ -134,21 +134,21 @@ typedef enum
 	SENSOR_ULTRAVIOLET,                      /**< Ultraviolet sensor */
 	SENSOR_TEMPERATURE,                      /**< Temperature sensor */
 	SENSOR_HUMIDITY,                         /**< Humidity sensor */
-	SENSOR_HRM,                              /**< Heart Rate Monitor sensor */
-	SENSOR_HRM_LED_GREEN,                    /**< HRM (LED Green) sensor */
-	SENSOR_HRM_LED_IR,                       /**< HRM (LED IR) sensor */
-	SENSOR_HRM_LED_RED,                      /**< HRM (LED RED) sensor */
-	SENSOR_GYROSCOPE_UNCALIBRATED,           /**< Uncalibrated Gyroscope sensor */
-	SENSOR_GEOMAGNETIC_UNCALIBRATED,         /**< Uncalibrated Geomagnetic sensor */
-	SENSOR_GYROSCOPE_ROTATION_VECTOR,        /**< Gyroscope-based Rotation Vector sensor */
-	SENSOR_GEOMAGNETIC_ROTATION_VECTOR,      /**< Geomagnetic-based Rotation Vector sensor */
+	SENSOR_HRM,                              /**< Heart Rate Monitor sensor @if MOBILE (Since Tizen 2.3.1) @endif */
+	SENSOR_HRM_LED_GREEN,                    /**< HRM (LED Green) sensor @if MOBILE (Since Tizen 2.3.1) @endif */
+	SENSOR_HRM_LED_IR,                       /**< HRM (LED IR) sensor @if MOBILE (Since Tizen 2.3.1) @endif */
+	SENSOR_HRM_LED_RED,                      /**< HRM (LED RED) sensor @if MOBILE (Since Tizen 2.3.1) @endif */
+	SENSOR_GYROSCOPE_UNCALIBRATED,           /**< Uncalibrated Gyroscope sensor (Since Tizen 2.4) */
+	SENSOR_GEOMAGNETIC_UNCALIBRATED,         /**< Uncalibrated Geomagnetic sensor (Since Tizen 2.4) */
+	SENSOR_GYROSCOPE_ROTATION_VECTOR,        /**< Gyroscope-based rotation vector sensor (Since Tizen 2.4) */
+	SENSOR_GEOMAGNETIC_ROTATION_VECTOR,      /**< Geomagnetic-based rotation vector sensor (Since Tizen 2.4) */
 	SENSOR_LAST,                             /**< End of sensor enum values */
 	SENSOR_CUSTOM = 10000                    /**< Custom sensor */
 } sensor_type_e;
 
 /**
  * @brief Enumeration for sensor options.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 #ifndef __SENSOR_COMMON_H__
 typedef enum
@@ -163,7 +163,7 @@ typedef enum
 /**
  * @brief Checks whether a given sensor type is available on a device.
  * @details Availability of a sensor should be checked first because this sensor may not be supported on the device.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  * @remarks For getting a handle of HRM Sensor(including HRM_LED_GREEN, HRM_LED_IR and HRM_LED_RED)
  * the privilege should be set to, %http://tizen.org/privilege/healthinfo.
  *
@@ -182,7 +182,7 @@ int sensor_is_supported(sensor_type_e type, bool *supported);
 
 /**
  * @brief Gets a specific sensor handle.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  * @remarks For getting a handle of HRM Sensor(including HRM_LED_GREEN, HRM_LED_IR and HRM_LED_RED)
  * the privilege should be set to, %http://tizen.org/privilege/healthinfo.
  *
@@ -200,7 +200,7 @@ int sensor_get_default_sensor(sensor_type_e type, sensor_h *sensor);
 
 /**
  * @brief Gets a sensor list.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  * @remarks If you want to get a handle list of all sensors,
  * use SENSOR_ALL type in sensor_type_e.
  * @remarks The caller should explicitly free this list.
@@ -220,7 +220,7 @@ int sensor_get_sensor_list(sensor_type_e type, sensor_h **list, int *sensor_coun
 
 /**
  * @brief Called when a sensor event occurs.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in] sensor    The sensor handle
  * @param[in] event     The event information
@@ -234,7 +234,7 @@ typedef void (*sensor_event_cb)(sensor_h sensor, sensor_event_s *event, void *da
 
 /**
  * @brief Creates a sensor listener.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @remarks You must release @a listener using sensor_destroy_listener().
  *
@@ -258,7 +258,7 @@ int sensor_create_listener(sensor_h sensor, sensor_listener_h *listener);
 
 /**
  * @brief Destroys the sensor handle and releases all its resources.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @remarks After this function is called, the attached sensor is detached and
  *          the corresponding sensor connection is released.
@@ -281,7 +281,7 @@ int sensor_destroy_listener(sensor_listener_h listener);
  * @details After this function is called, sensor events will occur and
  *          the specific sensor type related callback function will be called. An application can read sensor data.
  *
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in] listener  The listener handle
  *
@@ -304,7 +304,7 @@ int sensor_listener_start(sensor_listener_h listener);
  *
  * @details   The given @a type event will not occur any more and the callback functions also won't be called.
  *
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   listener  The listener handle
  *
@@ -321,11 +321,12 @@ int sensor_listener_stop(sensor_listener_h listener);
 
 /**
  * @brief  Registers a callback function to be invoked when a sensor event occurs.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   listener    The listener handle
  * @param[in]   interval_ms The interval at which sensor events are delivered (in milliseconds) \n
- *                          If @a rate is zero, it uses the default value(100ms)
+ *                          If @a rate is zero, it uses the default value(100ms) \n
+ *                          Min value is 10ms, Max value is 1000ms(10ms ~ 1000ms)
  * @param[in]   callback    The callback function to register
  * @param[in]   data        The user data to be passed to the callback function
  *
@@ -344,7 +345,7 @@ int sensor_listener_set_event_cb(sensor_listener_h listener, unsigned int interv
 
 /**
  * @brief  Unregisters the sensor callback function.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   listener    The listener handle
  *
@@ -366,7 +367,7 @@ int sensor_listener_unset_event_cb(sensor_listener_h listener);
  * @details When something is artificially influencing, such as ferrous metal objects or
  *          electromagnetic fields (car electrical systems, automobile engines, steel pitons, and so on.), this callback is called.
  *          One way of implementing this callback is to instruct a user to make big 8-like gestures with the device.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   sensor      The sensor handle
  * @param[in]   timestamp   The time in milliseconds at which the event happened
@@ -377,7 +378,7 @@ typedef void (*sensor_accuracy_changed_cb)(sensor_h sensor, unsigned long long t
 
 /**
  * @brief Registers an accuracy callback function to be invoked when the accuracy of a sensor has changed.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   listener    The listener handle
  * @param[in]   callback    The callback function to register
@@ -398,7 +399,7 @@ int sensor_listener_set_accuracy_cb(sensor_listener_h listener, sensor_accuracy_
 
 /**
  * @brief Unregisters the sensor accuracy changed callback function.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   listener    The listener handle
  *
@@ -416,7 +417,7 @@ int sensor_listener_unset_accuracy_cb(sensor_listener_h listener);
 
 /**
  * @brief Gets sensor data.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   listener    The listener handle
  * @param[out]  event       The event information
@@ -434,11 +435,12 @@ int sensor_listener_read_data(sensor_listener_h listener, sensor_event_s *event)
 
 /**
  * @brief Changes the interval at sensor measurements.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   listener       The listener handle
  * @param[in]   interval_ms    The interval at which sensor events are delivered (in milliseconds) \n
- *                             If @a rate is zero, it uses the default value(100ms)
+ *                             If @a rate is zero, it uses the default value(100ms) \n
+ *                             Min value is 10ms, Max value is 1000ms(10ms ~ 1000ms)
  *
  * @return      @c 0 on success,
  *              otherwise a negative error value
@@ -452,7 +454,7 @@ int sensor_listener_set_interval(sensor_listener_h listener, unsigned int interv
 
 /**
  * @brief Changes the max batch latency at sensor measurements.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   listener           The listener handle
  * @param[in]   max_batch_latency  The latency at which sensor events are delivered (in milliseconds)
@@ -470,7 +472,7 @@ int sensor_listener_set_max_batch_latency(sensor_listener_h listener, unsigned i
 /**
  * @brief Changes the option of the sensor.
  * @details If it is default, sensor data cannot be recieved when the LCD is off and in the power save mode.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   listener        The listener handle
  * @param[in]   option          The sensor option
@@ -495,7 +497,7 @@ int sensor_listener_set_option(sensor_listener_h listener, sensor_option_e optio
 
 /**
  * @brief Gets the name of the sensor.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   sensor          The sensor handle
  * @param[out]  name            The name of the sensor
@@ -511,7 +513,7 @@ int sensor_get_name(sensor_h sensor, char** name);
 
 /**
  * @brief Gets the vendor of the sensor.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   sensor          The sensor handle
  * @param[out]  vendor          The vendor of the sensor
@@ -527,7 +529,7 @@ int sensor_get_vendor(sensor_h sensor, char** vendor);
 
 /**
  * @brief Gets the type of the sensor.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   sensor          The sensor handle
  * @param[out]  type            The type of the sensor
@@ -543,7 +545,7 @@ int sensor_get_type(sensor_h sensor, sensor_type_e *type);
 
 /**
  * @brief Gets the minimum range of the sensor.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   sensor          The sensor handle
  * @param[out]  min_range       The minimum range
@@ -559,7 +561,7 @@ int sensor_get_min_range(sensor_h sensor, float *min_range);
 
 /**
  * @brief Gets the maximum range of the sensor.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   sensor          The sensor handle
  * @param[out]  max_range       The maximum range
@@ -575,7 +577,7 @@ int sensor_get_max_range(sensor_h sensor, float *max_range);
 
 /**
  * @brief Gets the resolution of the sensor.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   sensor          The sensor handle
  * @param[out]  resolution      The resolution
@@ -591,7 +593,7 @@ int sensor_get_resolution(sensor_h sensor, float *resolution);
 
 /**
  * @brief Gets the minimun interval of the sensor.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   sensor          The sensor handle
  * @param[out]  min_interval    The minimum interval (in milliseconds)
@@ -607,7 +609,7 @@ int sensor_get_min_interval(sensor_h sensor, int *min_interval);
 
 /**
  * @brief Gets the fifo count of the sensor.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   sensor          The sensor handle
  * @param[out]  fifo_count      The fifo count
@@ -623,7 +625,7 @@ int sensor_get_fifo_count(sensor_h sensor, int *fifo_count);
 
 /**
  * @brief Gets the maximum batch count of the sensor.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   sensor          The sensor handle
  * @param[out]  max_batch_count The maximum batch count
@@ -647,7 +649,7 @@ int sensor_get_max_batch_count(sensor_h sensor, int *max_batch_count);
 
 /**
  * @brief  Enumeration of the axis used in #sensor_util_remap_coordinate_system.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @see #sensor_util_remap_coordinate_system
  */
@@ -668,7 +670,7 @@ typedef enum
  *          [0 m 0] = I * R * geomagnetic (m = magnitude of the geomagnetic field) \n
  *          R is the identity matrix when the device is aligned with the world's coordinate system, that is, when the device's X axis points towards the East, the Y axis points to the North Pole and the device is facing the sky. \n
  *          I is a rotation matrix transforming the geomagnetic vector into the same coordinate space as gravity (the world's coordinate space). I is a simple rotation around the X axis. \n
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @remarks Parameters Gx, Gy, and Gz can be obtained from the values returned by #SENSOR_GRAVITY. \n
  *          Parameters Mx, My, and Mz can be obtained from the values returned by #SENSOR_MAGNETIC.
@@ -706,7 +708,7 @@ int sensor_util_get_rotation_matrix(float Gx, float Gy, float Gz,
  *
  * @details Rotation vectors (Vx, Vy, Vz) can be obtained from #SENSOR_ROTATION_VECTOR.
  *          It returns a 9 element rotation matrix in the array R. R must have length as 9.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]  Vx   The X-axis rotation vector
  * @param[in]  Vy   The Y-axis rotation vector
@@ -725,7 +727,7 @@ int sensor_util_get_rotation_matrix_from_vector(float Vx, float Vy, float Vz, fl
  * @brief Rotates the supplied rotation matrix so that it is expressed in a different coordinate system.
  *
  * @details This is typically used when an application needs to compute the three orientation angles of the device in a different coordinate system.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @remarks inR and outR can be the same array, but this is not recommended for performance reasons.
  *          This returns an error when X and Y define the same axis.
@@ -746,7 +748,7 @@ int sensor_util_remap_coordinate_system(float inR[], sensor_util_axis_e x, senso
 
 /**
  * @brief Computes the geomagnetic inclination angle in radians from the inclination matrix I returned by sensor_util_get_rotation_matrix().
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]  I            The inclination matrix from sensor_util_get_rotation_matrix()
  * @param[out] inclination  The geomagnetic inclination angle in radians
@@ -768,7 +770,7 @@ int sensor_util_get_inclination(float I[], float* inclination);
  *          - values[0]: azimuth, rotation around the Z axis.
  *          - values[1]: pitch, rotation around the X axis.
  *          - values[2]: roll, rotation around the Y axis.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @remarks Parameter R must be an array of 9 floats from sensor_util_get_rotation_matrix() \n
  *          Returned values are always arrays of 3 floats.
@@ -793,7 +795,7 @@ int sensor_util_get_orientation(float R[], float values[]);
  * @details Given a current rotation matrix (R) and a previous rotation matrix (prevR), it computes
  *          the rotation around the x,y, and z axes which transforms prevR to R.
  *          It outputs a 3 element vector containing the x,y, and z angle change at indexes 0, 1, and 2 respectively. \n
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @remarks Each input matrix is a 3x3 matrix like this form:
  *          <pre>
@@ -816,7 +818,7 @@ int sensor_util_get_angle_change(float R[], float prevR[], float angleChange[]);
 
 /**
  * @brief Gets the declination of the horizontal component of the magnetic field from true north, in degrees.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]  latitude     The latitude in geodetic coordinates
  * @param[in]  longitude    The longitude in geodetic coordinates

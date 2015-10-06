@@ -3,7 +3,7 @@ Summary:    A Sensor library in TIZEN C API
 Version:    0.1.18
 Release:    0
 Group:      System/API
-License:    Apache 2.0
+License:    Apache-2.0 and PD
 Source0:    %{name}-%{version}.tar.gz
 Source1:    capi-system-sensor.manifest
 
