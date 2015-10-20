@@ -417,6 +417,10 @@ int sensor_listener_unset_accuracy_cb(sensor_listener_h listener);
 
 /**
  * @brief Gets sensor data.
+ * @details	This function may fail (return #SENSOR_ERROR_OPERATION_FAILED) if it is called before the sensor is ready.
+ *			In case of interval-driven sensors,
+ *			it is recommended to call the function after at least one sensor event is delivered.
+ *			Otherwise, applications can retry to call this function to be sure that the sensor is ready.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   listener    The listener handle
@@ -428,6 +432,7 @@ int sensor_listener_unset_accuracy_cb(sensor_listener_h listener);
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
  * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
  * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
+ * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  *
  * @pre In order to read sensor data, an application should call sensor_listener_start().
  */
@@ -435,6 +440,11 @@ int sensor_listener_read_data(sensor_listener_h listener, sensor_event_s *event)
 
 /**
  * @brief Changes the interval at sensor measurements.
+ * @details	The specified interval is only a suggested interval between sensor measurements.
+ *			You will get at least one sensor measurement within the interval you specify,
+ *			but the actual interval between sensor measurements can be affected by other applications and the system.
+ *			To reduce the system overhead, it is recommended to set the longest interval that you can,
+ *			because the system usually chooses the shortest interval among all intervals specified.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   listener       The listener handle
@@ -471,7 +481,7 @@ int sensor_listener_set_max_batch_latency(sensor_listener_h listener, unsigned i
 
 /**
  * @brief Changes the option of the sensor.
- * @details If it is default, sensor data cannot be recieved when the LCD is off and in the power save mode.
+ * @details If it is default, sensor data cannot be received when the LCD is off and in the power save mode.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   listener        The listener handle
