@@ -71,6 +71,8 @@ typedef struct
 	unsigned long long timestamp;  /**< Timestamp */
 	int value_count;               /**< Count of values */
 	float values[MAX_VALUE_SIZE];  /**< Sensor values */
+	int extra_data_size;           /**< Size of Extra data */
+	void *extra_data;              /**< Extra data */
 } sensor_event_s;
 
 /**
