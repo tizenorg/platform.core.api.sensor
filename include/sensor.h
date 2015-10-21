@@ -163,6 +163,18 @@ typedef enum
 #endif
 
 /**
+ * @brief Enumeration for sensor wakeup mode.
+ * @since_tizen 3.0
+ */
+#ifndef __SENSOR_COMMON_H__
+typedef enum
+{
+	SENSOR_WAKEUP_OFF = 0, /**< non-wakeup mode */
+	SENSOR_WAKEUP_ON = 1,  /**< wakeup mode */
+} sensor_wakeup_e;
+#endif
+
+/**
  * @brief Checks whether a given sensor type is available on a device.
  * @details Availability of a sensor should be checked first because this sensor may not be supported on the device.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
@@ -320,6 +332,23 @@ int sensor_listener_start(sensor_listener_h listener);
  * @see sensor_listener_start()
  */
 int sensor_listener_stop(sensor_listener_h listener);
+
+/**
+ * @brief Changes whether the wakeup mode of the sensor is available or not.
+ * @details Availability of a wakeup mode should be checked first because this sensor's wakeup mode may not be supported on the device.
+ * @since_tizen 3.0
+ *
+ * @param[in]   listener        The listener handle
+ * @param[out] supported     If @c true this sensor's wakeup mode is supported, otherwise @c false
+ *
+ * @return      0 on success, otherwise a negative error value
+ * @retval      #SENSOR_ERROR_NONE                 Successful
+ * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
+ * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
+ * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ */
+int sensor_listener_is_wakeup_supported(sensor_listener_h listener, bool *supported);
 
 /**
  * @brief  Registers a callback function to be invoked when a sensor event occurs.
@@ -497,6 +526,23 @@ int sensor_listener_set_max_batch_latency(sensor_listener_h listener, unsigned i
  * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  */
 int sensor_listener_set_option(sensor_listener_h listener, sensor_option_e option);
+
+/**
+ * @brief Changes the wakeup mode of the sensor.
+ * @details If it is default, sensor data cannot be recieved when AP is asleep.
+ * @since_tizen 3.0
+ *
+ * @param[in]   listener        The listener handle
+ * @param[in]   wakeup        The sensor wakeup mode
+ *
+ * @return      0 on success, otherwise a negative error value
+ * @retval      #SENSOR_ERROR_NONE                 Successful
+ * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
+ * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
+ * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ */
+int sensor_listener_set_wakeup(sensor_listener_h listener, sensor_wakeup_e wakeup);
 
 /**
  * @}

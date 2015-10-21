@@ -333,6 +333,24 @@ int sensor_listener_stop(sensor_listener_h listener)
 	return SENSOR_ERROR_NONE;
 }
 
+int sensor_listener_is_wakeup_supported(sensor_listener_h listener, bool *supported)
+{
+	bool is_wakeup_supported = false;
+
+	_D("called sensor_is_wakeup_supported");
+
+	if (!listener || !supported)
+		return SENSOR_ERROR_INVALID_PARAMETER;
+
+	is_wakeup_supported = sensord_is_wakeup_supported(listener->sensor);
+
+	*supported = is_wakeup_supported;
+
+	_D("success sensor_is_wakeup_supported : [%d]", is_wakeup_supported);
+
+	return SENSOR_ERROR_NONE;
+}
+
 static void sensor_callback(sensor_t sensor, unsigned int event_type, sensor_data_t *data, void *user_data)
 {
 	sensor_event_s event;
@@ -560,6 +578,30 @@ int sensor_listener_set_option(sensor_listener_h listener, sensor_option_e optio
 	listener->option = option;
 
 	_D("success sensor_set_option");
+
+	return SENSOR_ERROR_NONE;
+}
+
+int sensor_listener_set_wakeup(sensor_listener_h listener, sensor_wakeup_e wakeup)
+{
+	int id;
+
+	_D("called sensor_set_wakeup : listener[0x%x], wakeup[%d]", listener, wakeup);
+
+	if (!listener)
+		return SENSOR_ERROR_INVALID_PARAMETER;
+
+	if (listener->magic != SENSOR_LISTENER_MAGIC)
+		return SENSOR_ERROR_INVALID_PARAMETER;
+
+	id = listener->id;
+
+	if (!sensord_set_wakeup(id, (int)wakeup))
+		return SENSOR_ERROR_OPERATION_FAILED;
+
+	listener->wakeup = wakeup;
+
+	_D("success sensor_set_wakeup");
 
 	return SENSOR_ERROR_NONE;
 }

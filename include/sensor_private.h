@@ -21,6 +21,7 @@ struct sensor_listener_s {
 	int id;
 	int type;
 	int option;
+	int wakeup;
 	unsigned int magic;
 	void *sensor;
 	void *callback;
