@@ -174,7 +174,6 @@ typedef enum
  * @return      @c 0 on success,
  *              otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
  *
  */
@@ -215,6 +214,7 @@ int sensor_get_default_sensor(sensor_type_e type, sensor_h *sensor);
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
  * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
  * @retval      #SENSOR_ERROR_PERMISSION_DENIED    Permission denied
+ * @retval      #SENSOR_ERROR_OUT_OF_MEMORY        Out of memory
  */
 int sensor_get_sensor_list(sensor_type_e type, sensor_h **list, int *sensor_count);
 
@@ -245,8 +245,8 @@ typedef void (*sensor_event_cb)(sensor_h sensor, sensor_event_s *event, void *da
  *              otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
  * @retval      #SENSOR_ERROR_OUT_OF_MEMORY        Out of memory
+ * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  *
  * @see sensor_listener_set_event_cb()
  * @see sensor_listener_set_interval()
@@ -269,7 +269,6 @@ int sensor_create_listener(sensor_h sensor, sensor_listener_h *listener);
  *              otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
  *
  * @see sensor_create_listener()
  */
@@ -289,8 +288,6 @@ int sensor_destroy_listener(sensor_listener_h listener);
  *              otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
  * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  *
  * @pre Call sensor_create_listener() before using this function.
@@ -312,8 +309,7 @@ int sensor_listener_start(sensor_listener_h listener);
  *              otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
+ * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  *
  * @see sensor_listener_start()
  */
@@ -334,8 +330,6 @@ int sensor_listener_stop(sensor_listener_h listener);
  *              otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
  * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  *
  * @see sensor_event_cb()
@@ -353,8 +347,6 @@ int sensor_listener_set_event_cb(sensor_listener_h listener, unsigned int interv
  *              otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
  * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  *
  * @see sensor_listener_set_event_cb()
@@ -388,8 +380,6 @@ typedef void (*sensor_accuracy_changed_cb)(sensor_h sensor, unsigned long long t
  *              otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
  * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  *
  * @see sensor_accuracy_changed_cb()
@@ -407,8 +397,6 @@ int sensor_listener_set_accuracy_cb(sensor_listener_h listener, sensor_accuracy_
  *              otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
  * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  *
  * @see sensor_listener_set_accuracy_cb()
@@ -430,8 +418,6 @@ int sensor_listener_unset_accuracy_cb(sensor_listener_h listener);
  *              otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
  * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  *
  * @pre In order to read sensor data, an application should call sensor_listener_start().
@@ -456,8 +442,6 @@ int sensor_listener_read_data(sensor_listener_h listener, sensor_event_s *event)
  *              otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
  * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  */
 int sensor_listener_set_interval(sensor_listener_h listener, unsigned int interval_ms);
@@ -473,9 +457,7 @@ int sensor_listener_set_interval(sensor_listener_h listener, unsigned int interv
  *              otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
- * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor listener does not support max batch latency in the current device
  */
 int sensor_listener_set_max_batch_latency(sensor_listener_h listener, unsigned int max_batch_latency);
 
@@ -490,8 +472,6 @@ int sensor_listener_set_max_batch_latency(sensor_listener_h listener, unsigned i
  * @return      0 on success, otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
  * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  */
 int sensor_listener_set_option(sensor_listener_h listener, sensor_option_e option);
@@ -515,9 +495,6 @@ int sensor_listener_set_option(sensor_listener_h listener, sensor_option_e optio
  * @return      0 on success, otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
- * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  */
 int sensor_get_name(sensor_h sensor, char** name);
 
@@ -531,9 +508,6 @@ int sensor_get_name(sensor_h sensor, char** name);
  * @return      0 on success, otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
- * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  */
 int sensor_get_vendor(sensor_h sensor, char** vendor);
 
@@ -547,8 +521,6 @@ int sensor_get_vendor(sensor_h sensor, char** vendor);
  * @return      0 on success, otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
  * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  */
 int sensor_get_type(sensor_h sensor, sensor_type_e *type);
@@ -563,8 +535,6 @@ int sensor_get_type(sensor_h sensor, sensor_type_e *type);
  * @return      0 on success, otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
  * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  */
 int sensor_get_min_range(sensor_h sensor, float *min_range);
@@ -579,8 +549,6 @@ int sensor_get_min_range(sensor_h sensor, float *min_range);
  * @return      0 on success, otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
  * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  */
 int sensor_get_max_range(sensor_h sensor, float *max_range);
@@ -595,8 +563,6 @@ int sensor_get_max_range(sensor_h sensor, float *max_range);
  * @return      0 on success, otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
  * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  */
 int sensor_get_resolution(sensor_h sensor, float *resolution);
@@ -611,8 +577,6 @@ int sensor_get_resolution(sensor_h sensor, float *resolution);
  * @return      0 on success, otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
  * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  */
 int sensor_get_min_interval(sensor_h sensor, int *min_interval);
@@ -627,8 +591,6 @@ int sensor_get_min_interval(sensor_h sensor, int *min_interval);
  * @return      0 on success, otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
  * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  */
 int sensor_get_fifo_count(sensor_h sensor, int *fifo_count);
@@ -643,8 +605,6 @@ int sensor_get_fifo_count(sensor_h sensor, int *fifo_count);
  * @return      0 on success, otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_IO_ERROR             I/O error
  * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  */
 int sensor_get_max_batch_count(sensor_h sensor, int *max_batch_count);
@@ -707,7 +667,6 @@ typedef enum
  *              otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
  */
 int sensor_util_get_rotation_matrix(float Gx, float Gy, float Gz,
         float Mx, float My, float Mz,
@@ -729,7 +688,6 @@ int sensor_util_get_rotation_matrix(float Gx, float Gy, float Gz,
  *              otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
  */
 int sensor_util_get_rotation_matrix_from_vector(float Vx, float Vy, float Vz, float R[]);
 
@@ -751,7 +709,6 @@ int sensor_util_get_rotation_matrix_from_vector(float Vx, float Vy, float Vz, fl
  *              otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
  *
  */
 int sensor_util_remap_coordinate_system(float inR[], sensor_util_axis_e x, sensor_util_axis_e y, float outR[]);
@@ -767,7 +724,6 @@ int sensor_util_remap_coordinate_system(float inR[], sensor_util_axis_e x, senso
  *              otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
  *
  * @see sensor_util_get_rotation_matrix()
  */
@@ -792,7 +748,6 @@ int sensor_util_get_inclination(float I[], float* inclination);
  *              otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
  *
  * @see sensor_util_get_rotation_matrix()
  *
@@ -822,7 +777,6 @@ int sensor_util_get_orientation(float R[], float values[]);
  *              otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
  */
 int sensor_util_get_angle_change(float R[], float prevR[], float angleChange[]);
 
@@ -839,7 +793,6 @@ int sensor_util_get_angle_change(float R[], float prevR[], float angleChange[]);
  *              otherwise a negative error value
  * @retval      #SENSOR_ERROR_NONE                 Successful
  * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
  */
 int sensor_util_get_declination(float latitude, float longitude, float altitude, float* declination);
 /**

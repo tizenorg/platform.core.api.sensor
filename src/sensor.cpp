@@ -162,7 +162,7 @@ int sensor_get_default_sensor(sensor_type_e type, sensor_h *sensor)
 	sensord_get_privilege(_sensor, &privilege);
 
 	if (privilege != SENSOR_PRIVILEGE_PUBLIC)
-		return SENSOR_ERROR_NOT_SUPPORTED;
+		return SENSOR_ERROR_PERMISSION_DENIED;
 
 	*sensor = _sensor;
 
@@ -189,6 +189,9 @@ int sensor_get_sensor_list(sensor_type_e type, sensor_h **list, int *sensor_coun
 
 	sensord_get_sensor_list(internal_type, &_list, &count);
 
+	if (count == 0)
+		return SENSOR_ERROR_NOT_SUPPORTED;
+
 	int i, j;
 	int count_public = 0;
 
@@ -204,7 +207,7 @@ int sensor_get_sensor_list(sensor_type_e type, sensor_h **list, int *sensor_coun
 
 	if (count_public == 0) {
 		free(_list);
-		return SENSOR_ERROR_NOT_SUPPORTED;
+		return SENSOR_ERROR_PERMISSION_DENIED;
 	}
 
 	*list = (sensor_h *) malloc((sizeof(int *)) * count_public);
@@ -253,7 +256,7 @@ int sensor_create_listener(sensor_h sensor, sensor_listener_h *listener)
 
 	if (error < 0) {
 		delete (struct sensor_listener_s *)_listener;
-		return error;
+		return SENSOR_ERROR_OPERATION_FAILED;
 	}
 
 	_listener->sensor = sensor;
