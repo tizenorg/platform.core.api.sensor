@@ -198,7 +198,7 @@ GEOMG1:
 		ar = ar*aor;
 		for (m = 0, D3 = 1, D4 = (n+m+D3)/D3; D4 > 0; D4--, m += D3) {
 			if (alt != oalt || glat != olat) {
-				if (n == m) {
+				if (n == m && m != 0) {
 					*(p+n+m*13) = st**(p+n-1+(m-1)*13);
 					dp[m][n] = st*dp[m-1][n-1]+ct**(p+n-1+(m-1)*13);
 					goto S50;
