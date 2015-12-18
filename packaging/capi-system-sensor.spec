@@ -1,6 +1,6 @@
 Name:       capi-system-sensor
 Summary:    A Sensor library in TIZEN C API
-Version:    0.1.18
+Version:    2.0.0
 Release:    0
 Group:      System/API
 License:    Apache-2.0 and PD
