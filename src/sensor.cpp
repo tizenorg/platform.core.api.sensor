@@ -105,6 +105,13 @@ static int sensor_connect (sensor_h sensor, sensor_listener_h listener)
 
 static sensor_type_t _sensor_type_to_internal_type(sensor_type_e type)
 {
+	int size;
+	size = sizeof(_TYPE) / sizeof(sensor_type_t);
+
+	if (type >= size) {
+		_E("Failed to change internal type: type[%d]", type);
+		return UNKNOWN_SENSOR;
+	}
 	return (type == SENSOR_ALL) ? ALL_SENSOR : _TYPE[type];
 }
 
@@ -123,6 +130,9 @@ int sensor_is_supported(sensor_type_e type, bool *supported)
 	_D("called sensor_is_supported : type[%d]", type);
 
 	internal_type = _sensor_type_to_internal_type(type);
+
+	if (internal_type == UNKNOWN_SENSOR)
+		return SENSOR_ERROR_INVALID_PARAMETER;
 
 	sensor = sensord_get_sensor(internal_type);
 	_supported = false;
@@ -153,6 +163,9 @@ int sensor_get_default_sensor(sensor_type_e type, sensor_h *sensor)
 		return SENSOR_ERROR_INVALID_PARAMETER;
 
 	internal_type = _sensor_type_to_internal_type(type);
+
+	if (internal_type == UNKNOWN_SENSOR)
+		return SENSOR_ERROR_INVALID_PARAMETER;
 
 	_sensor = sensord_get_sensor(internal_type);
 
@@ -186,6 +199,9 @@ int sensor_get_sensor_list(sensor_type_e type, sensor_h **list, int *sensor_coun
 		return SENSOR_ERROR_INVALID_PARAMETER;
 
 	internal_type = _sensor_type_to_internal_type(type);
+
+	if (internal_type == UNKNOWN_SENSOR)
+		return SENSOR_ERROR_INVALID_PARAMETER;
 
 	sensord_get_sensor_list(internal_type, &_list, &count);
 
