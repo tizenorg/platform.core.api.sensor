@@ -16,7 +16,7 @@ FOREACH(flag ${${fw_name}_CFLAGS})
     SET(EXTRA_CFLAGS "${EXTRA_CFLAGS} ${flag}")
 ENDFOREACH(flag)
 
-SET(EXTRA_CFLAGS "${EXTRA_CFLAGS} -fPIC -Wall -Werror -g -fdump-rtl-expand")
+SET(EXTRA_CFLAGS "${EXTRA_CFLAGS} -fPIC -Wall -g -fdump-rtl-expand")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_CFLAGS} -std=c++0x")
 SET(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
 SET(CMAKE_EXE_LINKER_FLAGS "-Wl,--as-needed -Wl, --rpath=${LIB_INSTALL_DIR}")
@@ -34,6 +34,8 @@ CONFIGURE_FILE(${fw_name}.pc.in ${CMAKE_CURRENT_SOURCE_DIR}/${fw_name}.pc @ONLY)
 INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${fw_name}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
 INSTALL(TARGETS ${fw_name} DESTINATION ${LIB_INSTALL_DIR} COMPONENT RuntimeLibraries)
 INSTALL(FILES include/sensor.h DESTINATION ${INCLUDE_INSTALL_DIR}/sensor)
+
+ADD_SUBDIRECTORY(sensorctl)
 
 # ###
 IF(UNIX)
