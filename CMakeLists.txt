@@ -1,42 +1,75 @@
+
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT(capi-system-sensor)
-
-# Setup for pkgconfig File
 SET(fw_name "capi-system-sensor")
+
+PROJECT(${fw_name})
+
+SET(CMAKE_INSTALL_PREFIX /usr)
 SET(PREFIX ${CMAKE_INSTALL_PREFIX})
-SET(VERSION 1.0)
 
-INCLUDE_DIRECTORIES(include)
+SET(INC_DIR include)
+INCLUDE_DIRECTORIES(${INC_DIR})
 
-# Build options
+SET(dependents "dlog sensor capi-base-common")
+SET(pc_dependents "capi-base-common")
+
 INCLUDE(FindPkgConfig)
-pkg_check_modules(${fw_name} REQUIRED dlog sensor capi-base-common)
-
+pkg_check_modules(${fw_name} REQUIRED ${dependents})
 FOREACH(flag ${${fw_name}_CFLAGS})
     SET(EXTRA_CFLAGS "${EXTRA_CFLAGS} ${flag}")
 ENDFOREACH(flag)
 
-SET(EXTRA_CFLAGS "${EXTRA_CFLAGS} -fPIC -Wall -Werror -g -fdump-rtl-expand")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_CFLAGS} -std=c++0x")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_CFLAGS} -fPIC -Wall -Werror -g -fdump-rtl-expand")
+SET(CMAKE_C_FLAGS_DEBUG "-O0 -g")
+
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_CFLAGS} -fPIC -Wall -Werror -g -fPIC -fdump-rtl-expand -std=c++0x")
 SET(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
-SET(CMAKE_EXE_LINKER_FLAGS "-Wl,--as-needed -Wl, --rpath=${LIB_INSTALL_DIR}")
 
-# Internal Logging Option
-#ADD_DEFINITIONS("-DTIZEN_DEBUG")
+IF("${ARCH}" STREQUAL "arm")
+    ADD_DEFINITIONS("-DTARGET")
+ENDIF("${ARCH}" STREQUAL "arm")
 
-# Complile Source files
-AUX_SOURCE_DIRECTORY(src SOURCES)
+ADD_DEFINITIONS("-DPREFIX=\"${CMAKE_INSTALL_PREFIX}\"")
+ADD_DEFINITIONS("-DTIZEN_DEBUG")
+
+SET(CMAKE_EXE_LINKER_FLAGS "-Wl,--as-needed -Wl,--rpath=/usr/lib")
+
+aux_source_directory(src SOURCES)
 ADD_LIBRARY(${fw_name} SHARED ${SOURCES})
 
 TARGET_LINK_LIBRARIES(${fw_name} ${${fw_name}_LDFLAGS})
-SET_TARGET_PROPERTIES(${fw_name} PROPERTIES VERSION ${FULLVER} SOVERSION ${MAJORVER} CLEAN_DIRECT_OUTPUT 1)
-CONFIGURE_FILE(${fw_name}.pc.in ${CMAKE_CURRENT_SOURCE_DIR}/${fw_name}.pc @ONLY)
-INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${fw_name}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
-INSTALL(TARGETS ${fw_name} DESTINATION ${LIB_INSTALL_DIR} COMPONENT RuntimeLibraries)
-INSTALL(FILES include/sensor.h DESTINATION ${INCLUDE_INSTALL_DIR}/sensor)
 
-# ###
+SET_TARGET_PROPERTIES(${fw_name}
+    PROPERTIES
+    VERSION ${FULLVER}
+    SOVERSION ${MAJORVER}
+    CLEAN_DIRECT_OUTPUT 1
+)
+
+INSTALL(TARGETS ${fw_name} DESTINATION lib)
+INSTALL(
+        DIRECTORY ${INC_DIR}/ DESTINATION include/sensor
+        FILES_MATCHING
+        PATTERN "*_private.h" EXCLUDE
+        PATTERN "*_log.h" EXCLUDE
+        PATTERN "${INC_DIR}/*.h"
+        )
+
+SET(PC_NAME ${fw_name})
+SET(PC_REQUIRED ${pc_dependents})
+SET(PC_LDFLAGS -l${fw_name})
+
+CONFIGURE_FILE(
+    ${fw_name}.pc.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/${fw_name}.pc
+    @ONLY
+)
+INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${fw_name}.pc DESTINATION lib/pkgconfig)
+
+ADD_SUBDIRECTORY(sensorctl)
+
 IF(UNIX)
+
 ADD_CUSTOM_TARGET (distclean @echo cleaning for source distribution)
 ADD_CUSTOM_COMMAND(
         DEPENDS clean
@@ -63,5 +96,6 @@ ADD_CUSTOM_COMMAND(
         TARGET  distclean
         VERBATIM
 )
+
 ENDIF(UNIX)
 
