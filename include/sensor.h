@@ -321,8 +321,8 @@ int sensor_listener_stop(sensor_listener_h listener);
  *
  * @param[in]   listener    The listener handle
  * @param[in]   interval_ms The interval at which sensor events are delivered (in milliseconds) \n
- *                          If @a rate is zero, it uses the default value(100ms) \n
- *                          Min value is 10ms, Max value is 1000ms(10ms ~ 1000ms)
+ *                          If @a rate is zero, it uses the default value(usually 100ms, but it can be different value for each sensor) \n
+ *                          Usually recommended interval range is that, min value is 10ms, max value is 1000ms(10ms ~ 1000ms)
  * @param[in]   callback    The callback function to register
  * @param[in]   data        The user data to be passed to the callback function
  *
@@ -435,8 +435,8 @@ int sensor_listener_read_data(sensor_listener_h listener, sensor_event_s *event)
  *
  * @param[in]   listener       The listener handle
  * @param[in]   interval_ms    The interval at which sensor events are delivered (in milliseconds) \n
- *                             If @a rate is zero, it uses the default value(100ms) \n
- *                             Min value is 10ms, Max value is 1000ms(10ms ~ 1000ms)
+ *                             If @a rate is zero, it uses the default value(usually 100ms, but it can be different value for each sensor) \n
+ *                             Usually recommended interval range is that, min value is 10ms, max value is 1000ms(10ms ~ 1000ms)
  *
  * @return      @c 0 on success,
  *              otherwise a negative error value
