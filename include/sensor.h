@@ -25,70 +25,75 @@ extern "C"
 #endif
 
 /**
- * @file sensor.h
- * @brief This file contains Sensor API related structures and enumerations.
- */
-
-/**
  * @addtogroup CAPI_SYSTEM_SENSOR_MODULE
  * @{
  */
 
 #define MAX_VALUE_SIZE 16
-#ifndef TIZEN_ERROR_SENSOR
-#define TIZEN_ERROR_SENSOR -0x02440000
-#endif
-#ifndef TIZEN_ERROR_NOT_SUPPORTED
-#define TIZEN_ERROR_NOT_SUPPORTED (TIZEN_ERROR_MIN_PLATFORM_ERROR+2)
-#endif
+
 
 /**
- * @brief The sensor handle.
- * @details This handle indicates a specific sensor itself.
+ * @brief   Sensor handle.
+ * @details The handle for controlling a specific sensor can be retrieved using sensor_get_default_sensor().@n
+ *          The function returns the handle of the default sensor of a given type, and usually,
+ *          a device has one sensor for one type.
+ *          However, if the device supports multiple sensors of the same type,
+ *          sensor_get_sensor_list() function can be used to get the list of all the sensors of the type.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef void* sensor_h;
 
 
 /**
- * @brief The listener handle.
- * @details This listener is an event listener used to receive sensor data asynchronously.
+ * @brief   Sensor listener handle.
+ * @details For each #sensor_h, one or more sensor listeners can be created by using sensor_create_listener().
+ *          Then the sensor's data can observed asynchronously, can be read synchronously if available, via the listener.
+ *          Applications are also able to control the behavior of each sensor, for example,
+ *          update interval of sensor readings.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef struct sensor_listener_s *sensor_listener_h;
 
 
 /**
- * @brief The structure type containing information of an event.
- * @details It holds information such as timestamp, accuracy, and sensor values.
+ * @brief   Sensor data event delivered via sensor_event_cb().
+ * @details A sensor data is delivered as a structure, which contains the accuracy of the data,
+ *          the time when the data was observed, and the data array.
+ *          The data array is a fixed size @c float array, and the number of data fields
+ *          stored in the array varies with the sensor type.
+ *          For example, #SENSOR_ACCELEROMETER reports 3-dimensional data,
+ *          #sensor_event_s::value_count is thus set to 3.@n
+ *          Note that, even if the data values are @c float, in some cases,
+ *          it may contain one or more categorical data as in #sensor_proximity_e.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
- *
- * @remarks If you use proximity sensor, see #sensor_proximity_e
+ * @see     #sensor_pedometer_state_e
+ * @see     #sensor_sleep_state_e
  */
 typedef struct
 {
-	int accuracy;                  /**< Accuracy */
-	unsigned long long timestamp;  /**< Timestamp */
-	int value_count;               /**< Count of values */
-	float values[MAX_VALUE_SIZE];  /**< Sensor values */
+	int accuracy;                  /**< Accuracy of sensor data */
+	unsigned long long timestamp;  /**< Time when the sensor data was observed */
+	int value_count;               /**< Number of sensor data values stored in #sensor_event_s::values */
+	float values[MAX_VALUE_SIZE];  /**< Sensor data values */
 } sensor_event_s;
 
+
 /**
- * @brief Enumeration for sensor data accuracy.
+ * @brief   Enumeration for sensor data accuracy.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum
 {
-	SENSOR_DATA_ACCURACY_UNDEFINED   = -1,  /**< Undefined accuracy */
-	SENSOR_DATA_ACCURACY_BAD         = 0,   /**< Bad accuracy */
-	SENSOR_DATA_ACCURACY_NORMAL      = 1,   /**< Normal accuracy */
-	SENSOR_DATA_ACCURACY_GOOD        = 2,   /**< Good accuracy */
-	SENSOR_DATA_ACCURACY_VERYGOOD    = 3    /**< Very good accuracy */
+	SENSOR_DATA_ACCURACY_UNDEFINED   = -1,  /**< Undefined */
+	SENSOR_DATA_ACCURACY_BAD         = 0,   /**< Not accurate */
+	SENSOR_DATA_ACCURACY_NORMAL      = 1,   /**< Moderately accurate */
+	SENSOR_DATA_ACCURACY_GOOD        = 2,   /**< Highly accurate */
+	SENSOR_DATA_ACCURACY_VERYGOOD    = 3    /**< Very highly accurate */
 } sensor_data_accuracy_e;
 
 
 /**
- * @brief Enumeration for sensor error.
+ * @brief   Enumeration for errors.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum
@@ -96,58 +101,113 @@ typedef enum
 	SENSOR_ERROR_NONE                  = TIZEN_ERROR_NONE,                 /**< Successful */
 	SENSOR_ERROR_IO_ERROR              = TIZEN_ERROR_IO_ERROR,             /**< I/O error */
 	SENSOR_ERROR_INVALID_PARAMETER     = TIZEN_ERROR_INVALID_PARAMETER,    /**< Invalid parameter */
-	SENSOR_ERROR_NOT_SUPPORTED         = TIZEN_ERROR_NOT_SUPPORTED,        /**< Unsupported sensor in the current device */
+	SENSOR_ERROR_NOT_SUPPORTED         = TIZEN_ERROR_NOT_SUPPORTED,        /**< Not supported */
 	SENSOR_ERROR_PERMISSION_DENIED     = TIZEN_ERROR_PERMISSION_DENIED,    /**< Permission denied */
 	SENSOR_ERROR_OUT_OF_MEMORY         = TIZEN_ERROR_OUT_OF_MEMORY,        /**< Out of memory */
 	SENSOR_ERROR_NOT_NEED_CALIBRATION  = TIZEN_ERROR_SENSOR | 0x03,        /**< Sensor doesn't need calibration */
 	SENSOR_ERROR_OPERATION_FAILED      = TIZEN_ERROR_SENSOR | 0x06,        /**< Operation failed */
 } sensor_error_e;
 
+
 /**
- * @brief Enumeration for proximity sensor.
+ * @brief   Enumeration for proximity sensor events.
+ * @details In its #sensor_event_s, #SENSOR_PROXIMITY reports the existence of
+ *          nearby objects in front of the sensor as one of the followings.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum
 {
-	SENSOR_PROXIMITY_NEAR = 0,    /**< The object is near */
-	SENSOR_PROXIMITY_FAR = 5,     /**< The object is far */
+	SENSOR_PROXIMITY_NEAR = 0,    /**< An object is placed near the proximity sensor */
+	SENSOR_PROXIMITY_FAR = 5,     /**< No object is placed near the proximity sensor */
 } sensor_proximity_e;
 
 
 /**
- * @brief Enumeration for sensor types.
+ * @brief   Enumeration for pedestrian state.
+ * @details In its #sensor_event_s, #SENSOR_HUMAN_PEDOMETER reports the user's
+ *          pedestrian state as one of the followings.
+ * @since_tizen 3.0
+ */
+typedef enum
+{
+	SENSOR_PEDOMETER_STATE_UNKNOWN = 0, /**< Uncertain */
+	SENSOR_PEDOMETER_STATE_STOP,        /**< The user is not moving */
+	SENSOR_PEDOMETER_STATE_WALK,        /**< The user is walking */
+	SENSOR_PEDOMETER_STATE_RUN,         /**< The user is running */
+} sensor_pedometer_state_e;
+
+
+/**
+ * @brief   Enumeration for sleep state.
+ * @details In its #sensor_event_s, #SENSOR_HUMAN_SLEEP_MONITOR reports the user's
+ *          sleep state as one of the followings.
+ * @since_tizen 3.0
+ */
+typedef enum
+{
+	SENSOR_SLEEP_STATE_UNKNOWN = 0, /**< Uncertain */
+	SENSOR_SLEEP_STATE_SLEEP,       /**< The user is asleep */
+	SENSOR_SLEEP_STATE_AWAKE,       /**< The user is awake */
+} sensor_sleep_state_e;
+
+
+/**
+ * @brief   Enumeration for sensor types.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum
 {
-	SENSOR_ALL = -1,                         /**< All sensors */
-	SENSOR_ACCELEROMETER,                    /**< Accelerometer */
-	SENSOR_GRAVITY,                          /**< Gravity sensor */
-	SENSOR_LINEAR_ACCELERATION,              /**< Linear acceleration sensor */
-	SENSOR_MAGNETIC,                         /**< Magnetic sensor */
-	SENSOR_ROTATION_VECTOR,                  /**< Rotation Vector sensor */
-	SENSOR_ORIENTATION,                      /**< Orientation sensor */
-	SENSOR_GYROSCOPE,                        /**< Gyroscope sensor */
-	SENSOR_LIGHT,                            /**< Light sensor */
-	SENSOR_PROXIMITY,                        /**< Proximity sensor */
-	SENSOR_PRESSURE,                         /**< Pressure sensor */
-	SENSOR_ULTRAVIOLET,                      /**< Ultraviolet sensor */
-	SENSOR_TEMPERATURE,                      /**< Temperature sensor */
-	SENSOR_HUMIDITY,                         /**< Humidity sensor */
-	SENSOR_HRM,                              /**< Heart Rate Monitor sensor @if MOBILE (Since Tizen 2.3.1) @endif */
-	SENSOR_HRM_LED_GREEN,                    /**< HRM (LED Green) sensor @if MOBILE (Since Tizen 2.3.1) @endif */
-	SENSOR_HRM_LED_IR,                       /**< HRM (LED IR) sensor @if MOBILE (Since Tizen 2.3.1) @endif */
-	SENSOR_HRM_LED_RED,                      /**< HRM (LED RED) sensor @if MOBILE (Since Tizen 2.3.1) @endif */
-	SENSOR_GYROSCOPE_UNCALIBRATED,           /**< Uncalibrated Gyroscope sensor (Since Tizen 2.4) */
-	SENSOR_GEOMAGNETIC_UNCALIBRATED,         /**< Uncalibrated Geomagnetic sensor (Since Tizen 2.4) */
-	SENSOR_GYROSCOPE_ROTATION_VECTOR,        /**< Gyroscope-based rotation vector sensor (Since Tizen 2.4) */
-	SENSOR_GEOMAGNETIC_ROTATION_VECTOR,      /**< Geomagnetic-based rotation vector sensor (Since Tizen 2.4) */
-	SENSOR_LAST,                             /**< End of sensor enum values */
-	SENSOR_CUSTOM = 10000                    /**< Custom sensor */
+	SENSOR_ALL = -1,                        /**< All sensors. This can be used to retrieve #sensor_h for all available sensors. */
+	SENSOR_ACCELEROMETER,                   /**< Accelerometer */
+	SENSOR_GRAVITY,                         /**< Gravity sensor */
+	SENSOR_LINEAR_ACCELERATION,             /**< Linear acceleration sensor */
+	SENSOR_MAGNETIC,                        /**< Magnetic sensor */
+	SENSOR_ROTATION_VECTOR,                 /**< Rotation vector sensor */
+	SENSOR_ORIENTATION,                     /**< Orientation sensor */
+	SENSOR_GYROSCOPE,                       /**< Gyroscope */
+	SENSOR_LIGHT,                           /**< Light sensor */
+	SENSOR_PROXIMITY,                       /**< Proximity sensor */
+	SENSOR_PRESSURE,                        /**< Pressure sensor */
+	SENSOR_ULTRAVIOLET,                     /**< Ultraviolet sensor */
+	SENSOR_TEMPERATURE,                     /**< Temperature sensor */
+	SENSOR_HUMIDITY,                        /**< Humidity sensor */
+	SENSOR_HRM,                             /**< Heart-rate monitor
+	                                             @if MOBILE (Since 2.4) @endif @n
+	                                             Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HRM_LED_GREEN,                   /**< Green LED sensor of HRM
+	                                             @if MOBILE (Since 2.4) @endif @n
+	                                             Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HRM_LED_IR,                      /**< Infra-Red LED sensor of HRM
+	                                             @if MOBILE (Since 2.4) @endif @n
+	                                             Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HRM_LED_RED,                     /**< Red LED sensor of HRM
+	                                             @if MOBILE (Since 2.4) @endif @n
+	                                             Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_GYROSCOPE_UNCALIBRATED,          /**< Uncalibrated Gyroscope sensor
+	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 3.0) @endif */
+	SENSOR_GEOMAGNETIC_UNCALIBRATED,        /**< Uncalibrated Geomagnetic sensor
+	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 3.0) @endif */
+	SENSOR_GYROSCOPE_ROTATION_VECTOR,       /**< Gyroscope-based rotation vector sensor
+	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 3.0) @endif */
+	SENSOR_GEOMAGNETIC_ROTATION_VECTOR,     /**< Geomagnetic-based rotation vector sensor
+	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 3.0) @endif */
+	SENSOR_ACTIVITY_STATIONARY = 0x100,     /**< Activity sensor detecting that the device is not moving (Since 3.0) */
+	SENSOR_ACTIVITY_WALK,                   /**< Activity sensor detecting that the device is on a user who is walking (Since 3.0) */
+	SENSOR_ACTIVITY_RUN,                    /**< Activity sensor detecting that the device is on a user who is running (Since 3.0) */
+	SENSOR_ACTIVITY_IN_VEHICLE,             /**< Activity sensor detecting that the device is in a moving vehicle, like a car (Since 3.0) */
+	SENSOR_ACTIVITY_ON_BICYCLE,             /**< Activity sensor detecting that the device is on a bicycle (Since 3.0) */
+	SENSOR_GESTURE_MOVEMENT = 0x200,        /**< Gesture sensor detecting any significant movements (Since 3.0) */
+	SENSOR_GESTURE_WRIST_UP,                /**< Gesture sensor detecting wrist-up gestures (Since 3.0) */
+	SENSOR_GESTURE_WRIST_DOWN,              /**< Gesture sensor detecting wrist-down gestures (Since 3.0) */
+	SENSOR_HUMAN_PEDOMETER = 0x300,         /**< Pedometer (Since 3.0) @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HUMAN_SLEEP_MONITOR,             /**< Sleep monitor (Since 3.0) @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_LAST,                            /**< End of sensor enum values (Deprecated since 3.0) */
+	SENSOR_CUSTOM = 0x2710,                 /**< Custom sensor (Deprecated since 3.0) */
 } sensor_type_e;
 
+
 /**
- * @brief Enumeration for sensor options.
+ * @brief   Enumeration for sensor options.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 #ifndef __SENSOR_COMMON_H__
@@ -160,319 +220,450 @@ typedef enum
 } sensor_option_e;
 #endif
 
+
 /**
- * @brief Checks whether a given sensor type is available on a device.
- * @details Availability of a sensor should be checked first because this sensor may not be supported on the device.
+ * @brief   Enumeration for sensor listener behavior attributes
+ * @since_tizen 3.0
+ * @see     #sensor_axis_e
+ * @see     #sensor_pause_e
+ */
+typedef enum
+{
+	SENSOR_ATTRIBUTE_AXIS_ORIENTATION = 1,  /**< Reference orientation of sensor data to be reported */
+	SENSOR_ATTRIBUTE_PAUSE_POLICY,          /**< Pause-and-resume policy of sensors */
+} sensor_attribute_e;
+
+
+/**
+ * @brief   Enumeration for reference orientations of sensor data
+ * @details The sensor's physical orientation may differ from what applications are aware of,
+ *          in cases that the device has a rotated screen, physically or logically.
+ *          For example, a watch device may have right hand mode, which logically rotates
+ *          the display 180 degrees.
+ *          Applications may not be aware of such situations, thus they may receives
+ *          sensor data inverted in X and Y directions.
+ *          With #SENSOR_AXIS_DISPLAY_ORIENTED option, applications can get data that
+ *          are properly aligned with the orientation of which they are aware.@n
+ *          By default, #SENSOR_AXIS_DISPLAY_ORIENTED is used.
+ *          If you need to use the data that are not affected by display orientations,
+ *          #SENSOR_AXIS_DEVICE_ORIENTED needs to be set.
+ * @since_tizen 3.0
+ */
+typedef enum
+{
+	SENSOR_AXIS_DEVICE_ORIENTED = 1,    /**< Using the device orientation as the reference coordinate */
+	SENSOR_AXIS_DISPLAY_ORIENTED,       /**< Using the display orientation as the reference coordinate */
+} sensor_axis_e;
+
+
+/**
+ * @brief   Enumeration for pause policies of sensor listeners
+ * @details To be power-efficient, you can set the policy of how to pause and resume
+ *          a sensor listener regarding the system status.
+ *          By default, #SENSOR_PAUSE_ALL is used to obtain the maximum power efficiency.
+ * @since_tizen 3.0
+ */
+typedef enum
+{
+	SENSOR_PAUSE_NONE = 0,              /**< The sensor will not pause, unless the system goes into sleep mode */
+	SENSOR_PAUSE_ON_DISPLAY_OFF = 1,    /**< The sensor pauses while the display is off*/
+	SENSOR_PAUSE_ON_POWERSAVE_MODE = 2, /**< The sensor pauses while the power-save mode is enabled */
+	SENSOR_PAUSE_ALL = 3,               /**< The sensor pauses in all the above cases */
+} sensor_pause_e;
+
+
+/**
+ * @brief   Checks whether a given sensor type is supported in the current device.
+ * @details If the given sensor type is not supported, sensor_get_default_sensor() will return an error.
+ *          It is thus recommended to check the availability of the sensor before actually acquiring #sensor_h.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
- * @remarks For getting a handle of HRM Sensor(including HRM_LED_GREEN, HRM_LED_IR and HRM_LED_RED)
- * the privilege should be set to, %http://tizen.org/privilege/healthinfo.
  *
- * @param[in]   type        The sensor type to check
- * @param[out]  supported   If @c true this sensor type is supported,
- *                          otherwise @c false
+ * @param[in]   type        A sensor type to check
+ * @param[out]  supported   If supported, @c true; Otherwise @c false
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- *
+ * @return  #SENSOR_ERROR_NONE on success; Otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
  */
 int sensor_is_supported(sensor_type_e type, bool *supported);
 
+
 /**
- * @brief Gets a specific sensor handle.
+ * @brief   Gets the handle for the default sensor of a given type.
+ * @details This function returns the handle for the sensor of a given type,
+ *          if the device has one sensor of the given type.
+ *          In case that the device has more than one sensors of the type,
+ *          this returns only the default sensor, which is designated by the device.@n
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
- * @remarks For getting a handle of HRM Sensor(including HRM_LED_GREEN, HRM_LED_IR and HRM_LED_RED)
- * the privilege should be set to, %http://tizen.org/privilege/healthinfo.
  *
- * @param[in]  type     The sensor type
- * @param[out] sensor   The sensor handle
+ * @privlevel   public
+ * @privilege   http://tizen.org/privilege/healthinfo
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_PERMISSION_DENIED    Permission denied
+ * @remarks Some sensor types are privileged, that is, application should have
+ *          the corresponding privilege to use one of them. @n
+ *          #SENSOR_HRM, #SENSOR_HRM_LED_GREEN, #SENSOR_HRM_LED_IR, #SENSOR_HRM_LED_RED,
+ *          #SENSOR_HUMAN_PEDOMETER, and #SENSOR_HUMAN_SLEEP_MONITOR require the privilege
+ *          http://tizen.org/privilege/healthinfo.
+ *
+ * @param[in]  type     A sensor type to get the handle of its default sensor
+ * @param[out] sensor   The sensor handle of the default sensor
+ *
+ * @return  #SENSOR_ERROR_NONE on success; Otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
+ * @retval  #SENSOR_ERROR_PERMISSION_DENIED    Permission denied
+ *
+ * @see     sensor_get_sensor_list()
  */
 int sensor_get_default_sensor(sensor_type_e type, sensor_h *sensor);
 
+
 /**
- * @brief Gets a sensor list.
+ * @brief   Gets the handle list of the sensors of a given type.
+ * @details A device may have more than one sensors of the given type.
+ *          In such case, this function can be used to get the handles of all sensors of the type.@n
+ *          The first element of the @c list denotes the default sensor,
+ *          which can be retrieved by sensor_get_default_sensor().
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
- * @remarks If you want to get a handle list of all sensors,
- * use SENSOR_ALL type in sensor_type_e.
- * @remarks The caller should explicitly free this list.
  *
- * @param[in]  type         The sensor type
- * @param[out] list         The sensor list
- * @param[out] sensor_count The count of sensors
+ * @privlevel   public
+ * @privilege   http://tizen.org/privilege/healthinfo
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
- * @retval      #SENSOR_ERROR_PERMISSION_DENIED    Permission denied
- * @retval      #SENSOR_ERROR_OUT_OF_MEMORY        Out of memory
+ * @remarks The @c list must be released using @c free().
+ * @remarks If this function is called with #SENSOR_ALL,
+ *          it returns the handles of all types of sensors supported in the device.
+ * @remarks Some sensor types are privileged, that is, application should have
+ *          the corresponding privilege to use one of them. @n
+ *          #SENSOR_HRM, #SENSOR_HRM_LED_GREEN, #SENSOR_HRM_LED_IR, #SENSOR_HRM_LED_RED,
+ *          #SENSOR_HUMAN_PEDOMETER, and #SENSOR_HUMAN_SLEEP_MONITOR require the privilege
+ *          http://tizen.org/privilege/healthinfo.
+ *
+ * @param[in]  type         A sensor type to get the list of sensor handles
+ * @param[out] list         An array of the sensor handles
+ * @param[out] sensor_count The number of handles contained in @c list
+ *
+ * @return  #SENSOR_ERROR_NONE on success; Otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported in the current device
+ * @retval  #SENSOR_ERROR_PERMISSION_DENIED    Permission denied
+ * @retval  #SENSOR_ERROR_OUT_OF_MEMORY        Out of memory
  */
 int sensor_get_sensor_list(sensor_type_e type, sensor_h **list, int *sensor_count);
 
+
 /**
- * @brief Called when a sensor event occurs.
+ * @brief   Checks whether a given sensor is a wake-up sensor or not.
+ * @details If a sensor is a wake-up sensor, the sensor is able to wake-up the system
+ *          to report its sensor data even if the system is in sleep mode.
+ * @since_tizen 3.0
+ *
+ * @param[in]   sensor  A sensor handle to check
+ * @param[out]  wakeup  If the sensor is a wake-up sensor, @c true;
+ *                      Otherwise @c false
+ *
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ *
+ * @pre     The handle @c sensor needs to be initialized using
+ *          sensor_get_default_sensor() or sensor_get_sensor_list() in advance.
+ */
+int sensor_is_wake_up(sensor_h sensor, bool *wakeup);
+
+
+/**
+ * @brief   Called when a sensor event occurs.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
- * @param[in] sensor    The sensor handle
- * @param[in] event     The event information
- * @param[in] data      The user data passed from the callback registration function
+ * @param[in] sensor    The corresponding sensor handle
+ * @param[in] event     A sensor event
+ * @param[in] data      The user data had passed to sensor_listener_set_event_cb()
  *
- * @see sensor_create_listener()
- * @see sensor_listener_set_event_cb()
- * @see sensor_listener_unset_event_cb()
+ * @pre     The sensor needs to be started regarding a listener handle, using sensor_listener_start().
  */
 typedef void (*sensor_event_cb)(sensor_h sensor, sensor_event_s *event, void *data);
 
+
 /**
- * @brief Creates a sensor listener.
+ * @brief   Creates a sensor listener.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
- * @remarks You must release @a listener using sensor_destroy_listener().
+ * @remarks The @c listener must be released using sensor_destroy_listener().
  *
- * @param[in]  sensor          The sensor handle
- * @param[out] listener        A new listener handle
+ * @param[in]  sensor          A sensor handle
+ * @param[out] listener        A listener handle of @c sensor
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_OUT_OF_MEMORY        Out of memory
- * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OUT_OF_MEMORY        Out of memory
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  *
- * @see sensor_listener_set_event_cb()
- * @see sensor_listener_set_interval()
- * @see sensor_listener_set_max_batch_latency()
- * @see sensor_listener_set_option()
- * @see sensor_destroy_listener()
+ * @pre     The handle @c sensor needs to be initialized using
+ *          sensor_get_default_sensor() or sensor_get_sensor_list() in advance.
  */
 int sensor_create_listener(sensor_h sensor, sensor_listener_h *listener);
 
+
 /**
- * @brief Destroys the sensor handle and releases all its resources.
+ * @brief   Releases all the resources allocated for a listener.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
- * @remarks After this function is called, the attached sensor is detached and
- *          the corresponding sensor connection is released.
+ * @remarks If this function is called while the sensor is still running,
+ *          that is, sensor_listener_start() was called but sensor_listener_stop() was not,
+ *          then it is implicitly stopped.
  *
- * @param[in] listener  The listener handle
+ * @param[in] listener  A listener handle
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
  *
- * @see sensor_create_listener()
+ * @see     sensor_create_listener()
  */
 int sensor_destroy_listener(sensor_listener_h listener);
 
+
 /**
- * @brief Starts the sensor server for the given listener.
- *
- * @details After this function is called, sensor events will occur and
- *          the specific sensor type related callback function will be called. An application can read sensor data.
- *
+ * @brief   Starts observing the sensor events regarding a given sensor listener.
+ * @details If a sensor listener is started, its event callback function starts to be called
+ *          whenever the corresponding sensor events occur.@n
+ *          For example, #SENSOR_ACCELEROMETER reports its sensor readings repeatedly,
+ *          with a specific update interval.
+ *          Note that, unlike the accelerometer, sensors like #SENSOR_PROXIMITY emit events
+ *          only if their states change.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
- * @param[in] listener  The listener handle
+ * @param[in]   listener  A listener handle
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  *
- * @pre Call sensor_create_listener() before using this function.
- *
- * @see sensor_listener_stop()
+ * @pre     The @c listener needs to be created in advance, by using sensor_create_listener().
+ *          Then the callback function needs to be attached to the @c listener, by using
+ *          sensor_listener_set_event_cb().
+ * @see     sensor_listener_stop()
  */
 int sensor_listener_start(sensor_listener_h listener);
 
+
 /**
- * @brief     Stops the sensor server for the given listener.
- *
- * @details   The given @a type event will not occur any more and the callback functions also won't be called.
- *
+ * @brief   Stops observing the sensor events regarding a given sensor listener.
+ * @details The listener's event callback function stops being called.
+ *          But the sensor itself may not be stopped if there are other clients
+ *          that are using the same sensor.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
- * @param[in]   listener  The listener handle
+ * @param[in]   listener  A listener handle
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  *
- * @see sensor_listener_start()
+ * @see     sensor_listener_start()
  */
 int sensor_listener_stop(sensor_listener_h listener);
 
+
 /**
- * @brief  Registers a callback function to be invoked when a sensor event occurs.
+ * @brief   Registers the callback function to be invoked when sensor events are delivered via a sensor listener.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
- * @param[in]   listener    The listener handle
- * @param[in]   interval_ms The interval at which sensor events are delivered (in milliseconds) \n
- *                          If @a rate is zero, it uses the default value(usually 100ms, but it can be different value for each sensor) \n
- *                          Usually recommended interval range is that, min value is 10ms, max value is 1000ms(10ms ~ 1000ms)
- * @param[in]   callback    The callback function to register
- * @param[in]   data        The user data to be passed to the callback function
+ * @param[in]   listener    A listener handle
+ * @param[in]   interval_ms A desired update interval between sensor events in milliseconds.@n
+ *                          If 0, it will be automatically set to the default interval of the corresponding sensor.
+ *                          Commonly the default interval is 100 ms, but it varies with the sensor and the device.@n
+ *                          Regarding sensors, there update intervals also have valid ranges.
+ *                          That is, any input values exceeding the valid range of a sensor will be
+ *                          implicitly adjusted into the valid range.
+ *                          The valid range of a sensor's update interval is usually from 10 ms to 1000 ms,
+ *                          however, it also can varies with the sensor and the device.
+ * @param[in]   callback    A callback function to attach with the @c listener handle
+ * @param[in]   data        A user data to be passed to the callback function
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  *
- * @see sensor_event_cb()
  * @see sensor_listener_unset_event_cb()
  */
 int sensor_listener_set_event_cb(sensor_listener_h listener, unsigned int interval_ms, sensor_event_cb callback, void *data);
 
+
 /**
- * @brief  Unregisters the sensor callback function.
+ * @brief   Unregisters the sensor event callback function attached to a given sensor listener.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
- * @param[in]   listener    The listener handle
+ * @param[in]   listener    A listener handle
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  *
- * @see sensor_listener_set_event_cb()
+ * @see     sensor_listener_set_event_cb()
  */
 int sensor_listener_unset_event_cb(sensor_listener_h listener);
 
+
 /**
- * @brief Called when the accuracy of a sensor has changed.
- *
- * @details When something is artificially influencing, such as ferrous metal objects or
- *          electromagnetic fields (car electrical systems, automobile engines, steel pitons, and so on.), this callback is called.
- *          One way of implementing this callback is to instruct a user to make big 8-like gestures with the device.
+ * @brief   Called when the accuracy of a sensor changes.
+ * @details Sensors can be affected by the environment.
+ *          For example, #SENSOR_MAGNETIC is sensitive to any surrounding objects that can influence
+ *          electromagnetic fields. This function is called if the accuracy of the corresponding sensor is changed.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
- * @param[in]   sensor      The sensor handle
- * @param[in]   timestamp   The time in milliseconds at which the event happened
- * @param[in]   accuracy    The accuracy of this data
- * @param[in]   user_data   The user data passed from the callback registration function
+ * @param[in]   sensor      A sensor handle
+ * @param[in]   timestamp   The time in milliseconds when the accuracy changed
+ * @param[in]   accuracy    The current accuracy of the sensor
+ * @param[in]   data        The user data had passed to sensor_listener_set_accuracy_cb()
  */
 typedef void (*sensor_accuracy_changed_cb)(sensor_h sensor, unsigned long long timestamp, sensor_data_accuracy_e accuracy, void *data);
 
+
 /**
- * @brief Registers an accuracy callback function to be invoked when the accuracy of a sensor has changed.
+ * @brief   Registers the callback function to be invoked when the accuracy of a sensor changes.
+ * @details In addition to sensor_event_cb(), sensor_accuracy_changed_cb() also can be attached
+ *          to sensor listeners. With this accuracy callback function, applications can be notified
+ *          the changes of the corresponding sensors separately.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
- * @param[in]   listener    The listener handle
- * @param[in]   callback    The callback function to register
- * @param[in]   data        The user data to be passed to the callback function
+ * @param[in]   listener    A listener handle
+ * @param[in]   callback    A callback function to attach with the @c listener handle
+ * @param[in]   data        A user data to be passed to the callback function
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  *
- * @see sensor_accuracy_changed_cb()
- * @see sensor_listener_unset_accuracy_cb()
+ * @pre     The @c listener needs to be started to get the change callbacks.
+ * @see     sensor_listener_unset_accuracy_cb()
  */
 int sensor_listener_set_accuracy_cb(sensor_listener_h listener, sensor_accuracy_changed_cb callback, void *data);
 
+
 /**
- * @brief Unregisters the sensor accuracy changed callback function.
+ * @brief   Unregisters the sensor accuracy change callback function attached to a given sensor listener.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
- * @param[in]   listener    The listener handle
+ * @param[in]   listener    A listener handle
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  *
- * @see sensor_listener_set_accuracy_cb()
+ * @see     sensor_listener_set_accuracy_cb()
  */
 int sensor_listener_unset_accuracy_cb(sensor_listener_h listener);
 
+
 /**
- * @brief Gets sensor data.
- * @details	This function may fail (return #SENSOR_ERROR_OPERATION_FAILED) if it is called before the sensor is ready.
- *			In case of interval-driven sensors,
- *			it is recommended to call the function after at least one sensor event is delivered.
- *			Otherwise, applications can retry to call this function to be sure that the sensor is ready.
+ * @brief   Reads the current sensor data via a given sensor listener.
+ * @details This function synchronously reads the sensor reading of the corresponding sensor, if available.
+ *          Otherwise, if the sensor is not ready to report its values, this function fails and returns
+ *          #SENSOR_ERROR_OPERATION_FAILED.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
- * @param[in]   listener    The listener handle
- * @param[out]  event       The event information
+ * @remark  As a sensor usually works in a event-driven manner, it may not be able to read its data on demand.
+ *          Then this function tries to return the last known values.@n
+ *          To be able to read the current values or the last known values, the sensor needs to be
+ *          enabled in advance. As an application cannot be sure that the sensor is already enabled
+ *			by other applications, it is recommended to start the sensor explicitly by using sensor_listener_start().@n
+ *          But note that, even if the sensor is started, on-demand reading can fail always,
+ *          thus it would be better to use the asynchronous callback approach.
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ * @param[in]   listener    A listener handle
+ * @param[out]  event       The retrieved sensor data
  *
- * @pre In order to read sensor data, an application should call sensor_listener_start().
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  */
 int sensor_listener_read_data(sensor_listener_h listener, sensor_event_s *event);
 
+
 /**
- * @brief Changes the interval at sensor measurements.
- * @details	The specified interval is only a suggested interval between sensor measurements.
- *			You will get at least one sensor measurement within the interval you specify,
- *			but the actual interval between sensor measurements can be affected by other applications and the system.
- *			To reduce the system overhead, it is recommended to set the longest interval that you can,
- *			because the system usually chooses the shortest interval among all intervals specified.
+ * @brief   Changes the update interval of a sensor.
+ * @details The specified interval is only a suggested interval between sensor measurements.
+ *          You will get at least one sensor measurement within the interval you specify,
+ *          but the actual interval between sensor measurements can be affected by other applications and the system.
+ *          To reduce the system overhead, it is recommended to set the longest interval that you can,
+ *          because the system usually chooses the shortest interval among all intervals specified.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
- * @param[in]   listener       The listener handle
- * @param[in]   interval_ms    The interval at which sensor events are delivered (in milliseconds) \n
- *                             If @a rate is zero, it uses the default value(usually 100ms, but it can be different value for each sensor) \n
- *                             Usually recommended interval range is that, min value is 10ms, max value is 1000ms(10ms ~ 1000ms)
+ * @param[in]   listener    A listener handle
+ * @param[in]   interval_ms A desired update interval between sensor events in milliseconds.@n
+ *                          If 0, it will be automatically set to the default interval of the corresponding sensor.
+ *                          Commonly the default interval is 100 ms, but it varies with the sensor and the device.@n
+ *                          Regarding sensors, there update intervals also have valid ranges.
+ *                          That is, any input values exceeding the valid range of a sensor will be
+ *                          implicitly adjusted into the valid range.
+ *                          The valid range of a sensor's update interval is usually from 10 ms to 1000 ms,
+ *                          however, it also can varies with the sensor and the device.
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  */
 int sensor_listener_set_interval(sensor_listener_h listener, unsigned int interval_ms);
 
+
 /**
- * @brief Changes the max batch latency at sensor measurements.
+ * @brief   Changes the max batch latency of a sensor.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
- * @param[in]   listener           The listener handle
- * @param[in]   max_batch_latency  The latency at which sensor events are delivered (in milliseconds)
+ * @param[in]   listener           A listener handle
+ * @param[in]   max_batch_latency  A desired batch latency in milliseconds
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor listener does not support max batch latency in the current device
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
  */
 int sensor_listener_set_max_batch_latency(sensor_listener_h listener, unsigned int max_batch_latency);
 
+
 /**
- * @brief Changes the option of the sensor.
- * @details If it is default, sensor data cannot be received when the LCD is off and in the power save mode.
+ * @brief   Sets an attribute to control the behavior of a sensor listener.
+ * @details Applications can change the behavior of a sensor listener, for example,
+ *          what is the reference coordinate of the sensor values,
+ *          and when the system is allowed to turn off the sensor implicitly to reduce the power consumption.
+ *          See #sensor_attribute_e for more details about the available control parameters.
+ * @since_tizen 3.0
+ *
+ * @param[in]   listener	A listener handle
+ * @param[in]   attribute	An attribute to change
+ * @param[in]   value		An attribute value
+ *
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ */
+int sensor_listener_set_attribute_int(sensor_listener_h listener, sensor_attribute_e attribute, int value);
+
+
+/**
+ * @brief   Changes the power-saving behavior of a sensor listener.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
- * @param[in]   listener        The listener handle
- * @param[in]   option          The sensor option
+ * @remark  sensor_listener_set_attribute_int() with #SENSOR_ATTRIBUTE_PAUSE_POLICY replaces this function.
  *
- * @return      0 on success, otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
- * @retval      #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ * @param[in]   listener        A listener handle
+ * @param[in]   option          A sensor option
+ *
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  */
 int sensor_listener_set_option(sensor_listener_h listener, sensor_option_e option);
 
@@ -568,7 +759,7 @@ int sensor_get_max_range(sensor_h sensor, float *max_range);
 int sensor_get_resolution(sensor_h sensor, float *resolution);
 
 /**
- * @brief Gets the minimun interval of the sensor.
+ * @brief Gets the minimum interval of the sensor.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]   sensor          The sensor handle
