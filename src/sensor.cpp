@@ -253,6 +253,11 @@ int sensor_get_sensor_list(sensor_type_e type, sensor_h **list, int *sensor_coun
 	return SENSOR_ERROR_NONE;
 }
 
+int sensor_is_wake_up(sensor_h sensor, bool *wakeup)
+{
+	return SENSOR_ERROR_NOT_SUPPORTED;
+}
+
 int sensor_create_listener(sensor_h sensor, sensor_listener_h *listener)
 {
 	struct sensor_listener_s *_listener;
@@ -555,6 +560,11 @@ int sensor_listener_set_max_batch_latency(sensor_listener_h listener, unsigned i
 	_D("success sensor_set_max_batch_latency");
 
 	return SENSOR_ERROR_NONE;
+}
+
+int sensor_listener_set_attribute_int(sensor_listener_h listener, sensor_attribute_e attribute, int value)
+{
+	return SENSOR_ERROR_NOT_SUPPORTED;
 }
 
 int sensor_listener_set_option(sensor_listener_h listener, sensor_option_e option)
