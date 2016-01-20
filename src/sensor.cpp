@@ -45,30 +45,6 @@
 
 #define SENSOR_LISTENER_MAGIC 0xCAFECAFE
 
-sensor_type_t _TYPE[] = {
-	ACCELEROMETER_SENSOR,
-	GRAVITY_SENSOR,
-	LINEAR_ACCEL_SENSOR,
-	GEOMAGNETIC_SENSOR,
-	ROTATION_VECTOR_SENSOR,
-	ORIENTATION_SENSOR,
-	GYROSCOPE_SENSOR,
-	LIGHT_SENSOR,
-	PROXIMITY_SENSOR,
-	PRESSURE_SENSOR,
-	ULTRAVIOLET_SENSOR,
-	TEMPERATURE_SENSOR,
-	HUMIDITY_SENSOR,
-	BIO_HRM_SENSOR,
-	BIO_LED_GREEN_SENSOR,
-	BIO_LED_IR_SENSOR,
-	BIO_LED_RED_SENSOR,
-	GYROSCOPE_UNCAL_SENSOR,
-	UNCAL_GEOMAGNETIC_SENSOR,
-	GAMING_RV_SENSOR,
-	GEOMAGNETIC_RV_SENSOR,
-};
-
 static int sensor_connect (sensor_h sensor, sensor_listener_h listener)
 {
 	int id = SENSOR_UNDEFINED_ID;
@@ -103,25 +79,12 @@ static int sensor_connect (sensor_h sensor, sensor_listener_h listener)
 	return id;
 }
 
-static sensor_type_t _sensor_type_to_internal_type(sensor_type_e type)
-{
-	int size;
-	size = sizeof(_TYPE) / sizeof(sensor_type_t);
-
-	if (type >= size) {
-		_E("Failed to change internal type: type[%d]", type);
-		return UNKNOWN_SENSOR;
-	}
-	return (type == SENSOR_ALL) ? ALL_SENSOR : _TYPE[type];
-}
-
 int sensor_is_supported(sensor_type_e type, bool *supported)
 {
 	sensor_t sensor;
 	bool _supported;
-	sensor_type_t internal_type;
 
-	if (type < SENSOR_ALL || type > SENSOR_CUSTOM)
+	if (type < SENSOR_ALL)
 		return SENSOR_ERROR_INVALID_PARAMETER;
 
 	if (!supported)
@@ -129,12 +92,7 @@ int sensor_is_supported(sensor_type_e type, bool *supported)
 
 	_D("called sensor_is_supported : type[%d]", type);
 
-	internal_type = _sensor_type_to_internal_type(type);
-
-	if (internal_type == UNKNOWN_SENSOR)
-		return SENSOR_ERROR_INVALID_PARAMETER;
-
-	sensor = sensord_get_sensor(internal_type);
+	sensor = sensord_get_sensor((sensor_type_t)type);
 	_supported = false;
 
 	if (sensor)
@@ -152,22 +110,16 @@ int sensor_get_default_sensor(sensor_type_e type, sensor_h *sensor)
 {
 	sensor_t _sensor;
 	sensor_privilege_t privilege;
-	sensor_type_t internal_type;
 
 	_D("called sensor_get_default_sensor : type[%d], sensor[0x%x]", type, sensor);
 
-	if (type < SENSOR_ALL || type > SENSOR_CUSTOM)
+	if (type < SENSOR_ALL)
 		return SENSOR_ERROR_INVALID_PARAMETER;
 
 	if (!sensor)
 		return SENSOR_ERROR_INVALID_PARAMETER;
 
-	internal_type = _sensor_type_to_internal_type(type);
-
-	if (internal_type == UNKNOWN_SENSOR)
-		return SENSOR_ERROR_INVALID_PARAMETER;
-
-	_sensor = sensord_get_sensor(internal_type);
+	_sensor = sensord_get_sensor((sensor_type_t)type);
 
 	if (!_sensor)
 		return SENSOR_ERROR_NOT_SUPPORTED;
@@ -188,22 +140,16 @@ int sensor_get_sensor_list(sensor_type_e type, sensor_h **list, int *sensor_coun
 {
 	sensor_h *_list = NULL;
 	int count;
-	sensor_type_t internal_type;
 
 	_D("called sensor_get_list : type[%d]");
 
-	if (type < SENSOR_ALL || type > SENSOR_CUSTOM)
+	if (type < SENSOR_ALL)
 		return SENSOR_ERROR_INVALID_PARAMETER;
 
 	if (!sensor_count || !list)
 		return SENSOR_ERROR_INVALID_PARAMETER;
 
-	internal_type = _sensor_type_to_internal_type(type);
-
-	if (internal_type == UNKNOWN_SENSOR)
-		return SENSOR_ERROR_INVALID_PARAMETER;
-
-	sensord_get_sensor_list(internal_type, &_list, &count);
+	sensord_get_sensor_list((sensor_type_t)type, &_list, &count);
 
 	if (count == 0)
 		return SENSOR_ERROR_NOT_SUPPORTED;
@@ -656,7 +602,6 @@ int sensor_get_vendor(sensor_h sensor, char** vendor)
 int sensor_get_type(sensor_h sensor, sensor_type_e *type)
 {
 	sensor_type_t _type;
-	int type_size;
 	_D("called sensor_get_type");
 
 	if (!sensor || !type)
@@ -665,14 +610,7 @@ int sensor_get_type(sensor_h sensor, sensor_type_e *type)
 	if (!sensord_get_type(sensor, &_type))
 		return SENSOR_ERROR_OPERATION_FAILED;
 
-	type_size = sizeof(_TYPE) / sizeof(sensor_type_t);
-
-	for (int i = 0; i < type_size; ++i) {
-		if (_TYPE[i] == _type) {
-			*type = (sensor_type_e)i;
-			break;
-		}
-	}
+	*type = (sensor_type_e) _type;
 
 	_D("success sensor_get_type : [%d]", *type);
 
