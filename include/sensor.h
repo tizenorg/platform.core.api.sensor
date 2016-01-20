@@ -25,70 +25,75 @@ extern "C"
 #endif
 
 /**
- * @file sensor.h
- * @brief This file contains Sensor API related structures and enumerations.
- */
-
-/**
  * @addtogroup CAPI_SYSTEM_SENSOR_MODULE
  * @{
  */
 
-#define MAX_VALUE_SIZE 16
-#ifndef TIZEN_ERROR_SENSOR
-#define TIZEN_ERROR_SENSOR -0x02440000
-#endif
-#ifndef TIZEN_ERROR_NOT_SUPPORTED
-#define TIZEN_ERROR_NOT_SUPPORTED (TIZEN_ERROR_MIN_PLATFORM_ERROR+2)
-#endif
+#define MAX_VALUE_SIZE	16
+
 
 /**
- * @brief The sensor handle.
- * @details This handle indicates a specific sensor itself.
+ * @brief	Sensor handle.
+ * @details	The handle for controlling a specific sensor can be retrieved using sensor_get_default_sensor().@n
+ *			The function returns the handle of the default sensor of a given type, and usually,
+ *			a device has one sensor for one type.
+ *			However, if the device supports multiple sensors of the same type,
+ *			sensor_get_sensor_list() function can be used to get the list of all the sensors of the type.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef void* sensor_h;
 
 
 /**
- * @brief The listener handle.
- * @details This listener is an event listener used to receive sensor data asynchronously.
+ * @brief	Sensor listener handle.
+ * @details	For each #sensor_h, one or more sensor listeners can be created by using sensor_create_listener().
+ *			Then the sensor's data can observed asynchronously, can be read synchronously if available, via the listener.
+ *			Applications are also able to control the behavior of each sensor, for example,
+ *			update interval of sensor readings.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef struct sensor_listener_s *sensor_listener_h;
 
 
 /**
- * @brief The structure type containing information of an event.
- * @details It holds information such as timestamp, accuracy, and sensor values.
+ * @brief	Sensor data event delivered via sensor_event_cb().
+ * @details	A sensor data is delivered as a structure, which contains the accuracy of the data,
+ *			the time when the data was observed, and the data array.
+ *			The data array is a fixed size @c float array, and the number of data fields
+ *			stored in the array varies with the sensor type.
+ *			For example, #SENSOR_ACCELEROMETER reports 3-dimensional data,
+ *			#sensor_event_s::value_count is thus set to 3.@
+ *			Note that, even if the data values are @c float, in some cases,
+ *			it may contain one or more categorical data as in #sensor_proximity_e.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
- *
- * @remarks If you use proximity sensor, see #sensor_proximity_e
+ * @see		#sensor_pedometer_state_e
+ * @see		#sensor_sleep_state_e
  */
 typedef struct
 {
-	int accuracy;                  /**< Accuracy */
-	unsigned long long timestamp;  /**< Timestamp */
-	int value_count;               /**< Count of values */
-	float values[MAX_VALUE_SIZE];  /**< Sensor values */
+	int accuracy;                  /**< Accuracy of sensor data */
+	unsigned long long timestamp;  /**< Time when the sensor data was observed */
+	int value_count;               /**< Number of sensor data values stored in #sensor_event_s::values */
+	float values[MAX_VALUE_SIZE];  /**< Sensor data values */
 } sensor_event_s;
 
+
 /**
- * @brief Enumeration for sensor data accuracy.
+ * @brief	Enumeration for sensor data accuracy.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum
 {
-	SENSOR_DATA_ACCURACY_UNDEFINED   = -1,  /**< Undefined accuracy */
-	SENSOR_DATA_ACCURACY_BAD         = 0,   /**< Bad accuracy */
-	SENSOR_DATA_ACCURACY_NORMAL      = 1,   /**< Normal accuracy */
-	SENSOR_DATA_ACCURACY_GOOD        = 2,   /**< Good accuracy */
-	SENSOR_DATA_ACCURACY_VERYGOOD    = 3    /**< Very good accuracy */
+	SENSOR_DATA_ACCURACY_UNDEFINED   = -1,  /**< Undefined */
+	SENSOR_DATA_ACCURACY_BAD         = 0,   /**< Not accurate */
+	SENSOR_DATA_ACCURACY_NORMAL      = 1,   /**< Moderately accurate */
+	SENSOR_DATA_ACCURACY_GOOD        = 2,   /**< Highly accurate */
+	SENSOR_DATA_ACCURACY_VERYGOOD    = 3    /**< Very highly accurate */
 } sensor_data_accuracy_e;
 
 
 /**
- * @brief Enumeration for sensor error.
+ * @brief	Enumeration for errors.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum
@@ -96,58 +101,125 @@ typedef enum
 	SENSOR_ERROR_NONE                  = TIZEN_ERROR_NONE,                 /**< Successful */
 	SENSOR_ERROR_IO_ERROR              = TIZEN_ERROR_IO_ERROR,             /**< I/O error */
 	SENSOR_ERROR_INVALID_PARAMETER     = TIZEN_ERROR_INVALID_PARAMETER,    /**< Invalid parameter */
-	SENSOR_ERROR_NOT_SUPPORTED         = TIZEN_ERROR_NOT_SUPPORTED,        /**< Unsupported sensor in the current device */
-	SENSOR_ERROR_PERMISSION_DENIED     = TIZEN_ERROR_PERMISSION_DENIED,    /**< Permission denied */
+	SENSOR_ERROR_NOT_SUPPORTED         = TIZEN_ERROR_NOT_SUPPORTED,        /**< Not supported */
+	SENSOR_ERROR_PERMISSION_DENIED     = TIZEN_ERROR_PERMISSION_DENIED,    /**< Privilege denied */
 	SENSOR_ERROR_OUT_OF_MEMORY         = TIZEN_ERROR_OUT_OF_MEMORY,        /**< Out of memory */
 	SENSOR_ERROR_NOT_NEED_CALIBRATION  = TIZEN_ERROR_SENSOR | 0x03,        /**< Sensor doesn't need calibration */
 	SENSOR_ERROR_OPERATION_FAILED      = TIZEN_ERROR_SENSOR | 0x06,        /**< Operation failed */
 } sensor_error_e;
 
+
 /**
- * @brief Enumeration for proximity sensor.
+ * @brief	Enumeration for proximity sensor events.
+ * @details	In its #sensor_event_s, #SENSOR_PROXIMITY reports the existence of
+ *			nearby objects in front of the sensor as one of the followings.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum
 {
-	SENSOR_PROXIMITY_NEAR = 0,    /**< The object is near */
-	SENSOR_PROXIMITY_FAR = 5,     /**< The object is far */
+	SENSOR_PROXIMITY_NEAR = 0,    /**< An object is placed near the proximity sensor */
+	SENSOR_PROXIMITY_FAR = 5,     /**< No object is placed near the proximity sensor */
 } sensor_proximity_e;
 
 
 /**
- * @brief Enumeration for sensor types.
+ * @brief	Enumeration for pedestrian state.
+ * @details	In its #sensor_event_s, #SENSOR_HUMAN_PEDOMETER reports the user's
+ *			pedestrian state as one of the followings.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ */
+typedef enum
+{
+	SENSOR_PEDOMETER_STATE_UNKNOWN = 0,	/**< Uncertain */
+	SENSOR_PEDOMETER_STATE_STOP,		/**< The user is not moving */
+	SENSOR_PEDOMETER_STATE_WALK,		/**< The user is walking */
+	SENSOR_PEDOMETER_STATE_RUN,			/**< The user is running */
+} sensor_pedometer_state_e;
+
+
+/**
+ * @brief	Enumeration for sleep state.
+ * @details	In its #sensor_event_s, #SENSOR_HUMAN_SLEEP_MONITOR reports the user's
+ *			sleep state as one of the followings.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ */
+typedef enum
+{
+	SENSOR_SLEEP_STATE_UNKNOWN = 0,	/**< Uncertain */
+	SENSOR_SLEEP_STATE_SLEEP,		/**< The user is asleep */
+	SENSOR_SLEEP_STATE_AWAKE,		/**< The user is awake */
+} sensor_sleep_state_e;
+
+
+/**
+ * @brief	Enumeration for sensor types.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum
 {
-	SENSOR_ALL = -1,                         /**< All sensors */
+	SENSOR_ALL = -1,                         /**< All sensors. This can be used to retrieve #sensor_h for all available sensors. */
 	SENSOR_ACCELEROMETER,                    /**< Accelerometer */
 	SENSOR_GRAVITY,                          /**< Gravity sensor */
 	SENSOR_LINEAR_ACCELERATION,              /**< Linear acceleration sensor */
 	SENSOR_MAGNETIC,                         /**< Magnetic sensor */
-	SENSOR_ROTATION_VECTOR,                  /**< Rotation Vector sensor */
+	SENSOR_ROTATION_VECTOR,                  /**< Rotation vector sensor */
 	SENSOR_ORIENTATION,                      /**< Orientation sensor */
-	SENSOR_GYROSCOPE,                        /**< Gyroscope sensor */
+	SENSOR_GYROSCOPE,                        /**< Gyroscope */
 	SENSOR_LIGHT,                            /**< Light sensor */
 	SENSOR_PROXIMITY,                        /**< Proximity sensor */
 	SENSOR_PRESSURE,                         /**< Pressure sensor */
 	SENSOR_ULTRAVIOLET,                      /**< Ultraviolet sensor */
 	SENSOR_TEMPERATURE,                      /**< Temperature sensor */
 	SENSOR_HUMIDITY,                         /**< Humidity sensor */
-	SENSOR_HRM,                              /**< Heart Rate Monitor sensor @if MOBILE (Since Tizen 2.3.1) @endif */
-	SENSOR_HRM_LED_GREEN,                    /**< HRM (LED Green) sensor @if MOBILE (Since Tizen 2.3.1) @endif */
-	SENSOR_HRM_LED_IR,                       /**< HRM (LED IR) sensor @if MOBILE (Since Tizen 2.3.1) @endif */
-	SENSOR_HRM_LED_RED,                      /**< HRM (LED RED) sensor @if MOBILE (Since Tizen 2.3.1) @endif */
-	SENSOR_GYROSCOPE_UNCALIBRATED,           /**< Uncalibrated Gyroscope sensor (Since Tizen 2.4) */
-	SENSOR_GEOMAGNETIC_UNCALIBRATED,         /**< Uncalibrated Geomagnetic sensor (Since Tizen 2.4) */
-	SENSOR_GYROSCOPE_ROTATION_VECTOR,        /**< Gyroscope-based rotation vector sensor (Since Tizen 2.4) */
-	SENSOR_GEOMAGNETIC_ROTATION_VECTOR,      /**< Geomagnetic-based rotation vector sensor (Since Tizen 2.4) */
-	SENSOR_LAST,                             /**< End of sensor enum values */
-	SENSOR_CUSTOM = 10000                    /**< Custom sensor */
+	SENSOR_HRM,                              /**< Heart-rate monitor
+											   @if MOBILE (Since Tizen 2.4) @endif @n
+											   Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HRM_LED_GREEN,                    /**< Green LED sensor of HRM
+											   @if MOBILE (Since Tizen 2.4) @endif @n
+											   Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HRM_LED_IR,                       /**< Infra-Red LED sensor of HRM
+											   @if MOBILE (Since Tizen 2.4) @endif @n
+											   Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HRM_LED_RED,                      /**< Red LED sensor of HRM
+											   @if MOBILE (Since Tizen 2.4) @endif @n
+											   Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_GYROSCOPE_UNCALIBRATED,           /**< Uncalibrated Gyroscope sensor
+											   @if MOBILE (Since 2.4) @elseif WEARABLE (Since 2.3.2) @endif */
+	SENSOR_GEOMAGNETIC_UNCALIBRATED,         /**< Uncalibrated Geomagnetic sensor
+											   @if MOBILE (Since 2.4) @elseif WEARABLE (Since 2.3.2) @endif */
+	SENSOR_GYROSCOPE_ROTATION_VECTOR,        /**< Gyroscope-based rotation vector sensor
+											   @if MOBILE (Since 2.4) @elseif WEARABLE (Since 2.3.2) @endif */
+	SENSOR_GEOMAGNETIC_ROTATION_VECTOR,      /**< Geomagnetic-based rotation vector sensor
+											   @if MOBILE (Since 2.4) @elseif WEARABLE (Since 2.3.2) @endif */
+	SENSOR_ACTIVITY_STATIONARY = 0x100,		/**< Activity sensor detecting that the device is not moving
+											   @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif */
+	SENSOR_ACTIVITY_WALK,					/**< Activity sensor detecting that the device is on a user who is walking
+											   @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif */
+	SENSOR_ACTIVITY_RUNN,					/**< Activity sensor detecting that the device is on a user who is running
+											   @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif */
+	SENSOR_ACTIVITY_IN_VEHICLE,				/**< Activity sensor detecting that the device is in a moving vehicle, like a car
+											   @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif */
+	SENSOR_ACTIVITY_ON_BICYCLE,				/**< Activity sensor detecting that the device is on a bicycle
+											   @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif */
+	SENSOR_GESTURE_MOVEMENT = 0x200,		/**< Gesture sensor detecting any significant movements
+											   @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif */
+	SENSOR_GESTURE_WRIST_UP,				/**< Gesture sensor detecting wrist-up gestures
+											   @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif */
+	SENSOR_GESTURE_WRIST_DOWN,				/**< Gesture sensor detecting wrist-down gestures
+											   @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif */
+	SENSOR_HUMAN_PEDOMETER = 0x300,			/**< Pedometer
+											   @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif @n
+											   Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HUMAN_SLEEP_MONITOR,				/**< Sleep monitor
+											   @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif @n
+											   Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_LAST,
+	SENSOR_CUSTOM = 0x2710,
 } sensor_type_e;
 
+
 /**
- * @brief Enumeration for sensor options.
+ * @brief	Enumeration for sensor options.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 #ifndef __SENSOR_COMMON_H__
@@ -159,6 +231,58 @@ typedef enum
 	SENSOR_OPTION_ALWAYS_ON,            /**< Receives data when the LCD is off and in the power save mode */
 } sensor_option_e;
 #endif
+
+
+/**
+ * @brief	Enumeration for sensor listener behavior attributes
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ * @see		#sensor_axis_e
+ * @see		#sensor_pause_e
+ */
+typedef enum
+{
+	SENSOR_ATTRIBUTE_AXIS_ORIENTATION = 1,	/**< Reference orientation of sensor data to be reported */
+	SENSOR_ATTRIBUTE_PAUSE_POLICY,			/**< Pause-and-resume policy of sensors */
+} sensor_attribute_e;
+
+
+/**
+ * @brief	Enumeration for reference orientations of sensor data
+ * @details	The sensor's physical orientation may differ from what applications are aware of,
+ *			in cases that the device has a rotated screen, physically or logically.
+ *			For example, a watch device may have right hand mode, which logically rotates
+ *			the display 180 degrees.
+ *			Applications may not be aware of such situations, thus they may receives
+ *			sensor data inverted in X and Y directions.
+ *			With #SENSOR_AXIS_DISPLAY_ORIENTED option, applications can get data that
+ *			are properly aligned with the orientation of which they are aware.@n
+ *			By default, #SENSOR_AXIS_DISPLAY_ORIENTED is used.
+ *			If you need to use the data that are not affected by display orientations,
+ *			#SENSOR_AXIS_DEVICE_ORIENTED needs to be set.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ */
+typedef enum
+{
+	SENSOR_AXIS_DEVICE_ORIENTED = 1,	/**< Using the device orientation as the reference coordinate */
+	SENSOR_AXIS_DISPLAY_ORIENTED,		/**< Using the display orientation as the reference coordinate */
+} sensor_axis_e;
+
+
+/**
+ * @brief	Enumeration for pause policies of sensor listeners
+ * @details	To be power-efficient, you can set the policy of how to pause and resume
+ *			a sensor listener regarding the system status.
+ *			By default, #SENSOR_PAUSE_ALL is used to obtain the maximum power efficiency.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ */
+typedef enum
+{
+	SENSOR_PAUSE_NONE = 0,					/**< The sensor will not pause, unless the system goes into sleep mode */
+	SENSOR_PAUSE_ON_DISPLAY_OFF = 1,		/**< The sensor pauses while the display is off*/
+	SENSOR_PAUSE_ON_POWERSAVE_MODE = 2,		/**< The sensor pauses while the power-save mode is enabled */
+	SENSOR_PAUSE_ALL = 3,					/**< The sensor pauses in all the above cases */
+} sensor_pause_e;
+
 
 /**
  * @brief Checks whether a given sensor type is available on a device.
@@ -178,6 +302,7 @@ typedef enum
  *
  */
 int sensor_is_supported(sensor_type_e type, bool *supported);
+
 
 /**
  * @brief Gets a specific sensor handle.
@@ -217,6 +342,22 @@ int sensor_get_default_sensor(sensor_type_e type, sensor_h *sensor);
  * @retval      #SENSOR_ERROR_OUT_OF_MEMORY        Out of memory
  */
 int sensor_get_sensor_list(sensor_type_e type, sensor_h **list, int *sensor_count);
+
+/**
+ * @brief	Checks whether a sensor is a wake-up sensor or not.
+ * @details	If a sensor is a wake-up sensor, the sensor is able to wake-up the system
+ *			to report its sensor data even if the system is in sleep mode.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ *
+ * @param[in]   sensor		The sensor handle
+ * @param[out]  wakeup		If the sensor is a wake-up sensor, @c true;
+ *                          Otherwise @c false
+ *
+ * @return      #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval      #SENSOR_ERROR_NONE                 Successful
+ * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ */
+int sensor_is_wake_up(sensor_h sensor, bool *wakeup);
 
 /**
  * @brief Called when a sensor event occurs.
@@ -460,6 +601,20 @@ int sensor_listener_set_interval(sensor_listener_h listener, unsigned int interv
  * @retval      #SENSOR_ERROR_NOT_SUPPORTED        The sensor listener does not support max batch latency in the current device
  */
 int sensor_listener_set_max_batch_latency(sensor_listener_h listener, unsigned int max_batch_latency);
+
+/**
+ * @brief	Sets an attribute to control the behavior of a sensor listener.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ *
+ * @param[in]   listener	The listener handle
+ * @param[in]	attribute	The attribute to change
+ * @param[in]	value		The attribute value
+ *
+ * @return      #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval      #SENSOR_ERROR_NONE                 Successful
+ * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ */
+int sensor_listener_set_attribute_int(sensor_listener_h listener, sensor_attribute_e attribute, int value);
 
 /**
  * @brief Changes the option of the sensor.
