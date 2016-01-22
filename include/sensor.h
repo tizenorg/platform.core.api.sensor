@@ -30,7 +30,7 @@ extern "C"
  */
 
 /**
- * @brief   The upper bound of #sensor_event_e::value_count.
+ * @brief   The upper bound of #sensor_event_s::value_count.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 #define MAX_VALUE_SIZE 16
@@ -255,8 +255,8 @@ typedef enum
  */
 typedef enum
 {
-	SENSOR_AXIS_DEVICE_ORIENTED = 1,    /**< Using the device orientation as the reference coordinate */
-	SENSOR_AXIS_DISPLAY_ORIENTED,       /**< Using the display orientation as the reference coordinate */
+	SENSOR_AXIS_DEVICE_ORIENTED = 1,    /**< Using the device orientation as the reference coordinate system */
+	SENSOR_AXIS_DISPLAY_ORIENTED,       /**< Using the display orientation as the reference coordinate system */
 } sensor_axis_e;
 
 
@@ -458,7 +458,7 @@ int sensor_listener_start(sensor_listener_h listener);
 /**
  * @brief   Stops observing the sensor events regarding a given sensor listener.
  * @details The listener's event callback function stops being called.
- *          But the sensor itself may not be stopped if there are other clients
+ *          But the sensor itself may not be stopped if there are other listeners
  *          that are using the same sensor.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
@@ -576,7 +576,7 @@ int sensor_listener_unset_accuracy_cb(sensor_listener_h listener);
  *          #SENSOR_ERROR_OPERATION_FAILED.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
- * @remark  As a sensor usually works in a event-driven manner, it may not be able to read its data on demand.
+ * @remark  As a sensor usually works in an event-driven manner, it may not be able to read its data on demand.
  *          Then this function tries to return the last known values.@n
  *          To be able to read the current values or the last known values, the sensor needs to be
  *          enabled in advance. As an application cannot be sure that the sensor is already enabled
@@ -623,8 +623,18 @@ int sensor_listener_set_interval(sensor_listener_h listener, unsigned int interv
 
 
 /**
- * @brief   Changes the max batch latency of a sensor.
+ * @brief   Sets the desired max batch latency of a sensor.
+ * @details Sensors that support batching may allow applications to change their maximum batch latencies.
+ *          For example, if you set the latency as 10,000 ms, the sensor may store its data
+ *          up to 10,000 ms, before delivering the data through the HAL.@n
+ *          In cases of non-batching sensors, this function returns #SENSOR_ERROR_NONE,
+ *          but nothing is affected by the input latency value.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
+ *
+ * @remarks Even if you set a batch latency, the sensor may not work as you intended,
+ *          as one sensor can be used by more than one listeners.
+ *          In addition, some batch sensors may already have fixed batching latency
+ *          or batching queue size, which cannot be altered by applications.
  *
  * @param[in]   listener           A listener handle
  * @param[in]   max_batch_latency  A desired batch latency in milliseconds
@@ -857,23 +867,27 @@ int sensor_get_max_batch_count(sensor_h sensor, int *max_batch_count);
  */
 
 /**
- * @brief  Enumeration of the axis used in #sensor_util_remap_coordinate_system.
+ * @brief   Enumeration of the axis used in sensor_util_remap_coordinate_system().
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
- *
- * @see #sensor_util_remap_coordinate_system
  */
 typedef enum
 {
-    sensor_util_axis_minus_x,
-    sensor_util_axis_minus_y,
-    sensor_util_axis_minus_z,
-    sensor_util_axis_x,
-    sensor_util_axis_y,
-    sensor_util_axis_z,
+    SENSOR_UTIL_AXIS_X = 0x01,          /**< +X */
+    SENSOR_UTIL_AXIS_Y = 0x02,          /**< +Y */
+    SENSOR_UTIL_AXIS_Z = 0x03,          /**< +Z */
+    SENSOR_UTIL_AXIS_MINUS_X = 0x81,    /**< -X */
+    SENSOR_UTIL_AXIS_MINUS_Y = 0x82,    /**< -Y */
+    SENSOR_UTIL_AXIS_MINUS_Z = 0x83,    /**< -Z */
+    sensor_util_axis_x = 0x01,
+    sensor_util_axis_y = 0x02,
+    sensor_util_axis_z = 0x03,
+    sensor_util_axis_minus_x = 0x81,
+    sensor_util_axis_minus_y = 0x82,
+    sensor_util_axis_minus_z = 0x83,
 } sensor_util_axis_e;
 
 /**
- * @brief Gets the Inclination matrix "I" and Rotation matrix "R" transforming a vector from the device coordinate to the world's coordinate.
+ * @brief   Gets the inclination matrix "I" and rotation matrix "R" transforming a vector from the device coordinate to the world's coordinate.
  *
  * @details [0 0 g] = R * gravity (g = magnitude of gravity) \n
  *          [0 m 0] = I * R * geomagnetic (m = magnitude of the geomagnetic field) \n
@@ -902,10 +916,9 @@ typedef enum
  * @param[out] I    The array of 9 floats that represent the inclination matrix "I" \n
  *                  It can be null.
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @return  #SENSOR_ERROR_NONE on success; Otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
  */
 int sensor_util_get_rotation_matrix(float Gx, float Gy, float Gz,
         float Mx, float My, float Mz,
@@ -923,10 +936,9 @@ int sensor_util_get_rotation_matrix(float Gx, float Gy, float Gz,
  * @param[in]  Vz   The Z-axis rotation vector
  * @param[out] R    A 9 element rotation matrix in the array R that must have length as 9
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @return  #SENSOR_ERROR_NONE on success; Otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
  */
 int sensor_util_get_rotation_matrix_from_vector(float Vx, float Vy, float Vz, float R[]);
 
@@ -944,10 +956,9 @@ int sensor_util_get_rotation_matrix_from_vector(float Vx, float Vy, float Vz, fl
  * @param[in]  y    The world axis and direction on which the Y axis of the device is mapped
  * @param[out] outR The transformed rotation matrix (3x3)
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @return  #SENSOR_ERROR_NONE on success; Otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
  *
  */
 int sensor_util_remap_coordinate_system(float inR[], sensor_util_axis_e x, sensor_util_axis_e y, float outR[]);
@@ -959,10 +970,9 @@ int sensor_util_remap_coordinate_system(float inR[], sensor_util_axis_e x, senso
  * @param[in]  I            The inclination matrix from sensor_util_get_rotation_matrix()
  * @param[out] inclination  The geomagnetic inclination angle in radians
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @return  #SENSOR_ERROR_NONE on success; Otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
  *
  * @see sensor_util_get_rotation_matrix()
  */
@@ -983,10 +993,9 @@ int sensor_util_get_inclination(float I[], float* inclination);
  * @param[in]  R         A 9 element rotation matrix in the array
  * @param[out] values    An array of 3 floats to hold the result
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @return  #SENSOR_ERROR_NONE on success; Otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
  *
  * @see sensor_util_get_rotation_matrix()
  *
@@ -1012,10 +1021,9 @@ int sensor_util_get_orientation(float R[], float values[]);
  * @param[in] prevR         The previous rotation matrix
  * @param[out] angleChange  An array of floats in which the angle change is stored
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @return  #SENSOR_ERROR_NONE on success; Otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
  */
 int sensor_util_get_angle_change(float R[], float prevR[], float angleChange[]);
 
@@ -1028,10 +1036,9 @@ int sensor_util_get_angle_change(float R[], float prevR[], float angleChange[]);
  * @param[in]  altitude     The altitude in geodetic coordinates
  * @param[out] declination  The declination of the horizontal component of the magnetic field in degrees
  *
- * @return      @c 0 on success,
- *              otherwise a negative error value
- * @retval      #SENSOR_ERROR_NONE                 Successful
- * @retval      #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @return  #SENSOR_ERROR_NONE on success; Otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
  */
 int sensor_util_get_declination(float latitude, float longitude, float altitude, float* declination);
 /**
