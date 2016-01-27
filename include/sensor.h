@@ -303,11 +303,10 @@ int sensor_is_supported(sensor_type_e type, bool *supported);
  * @privlevel   public
  * @privilege   http://tizen.org/privilege/healthinfo
  *
- * @remarks Some sensor types are privileged, that is, application should have
- *          the corresponding privilege to use one of them. @n
+ * @remarks Some sensor types are privileged. An application should have the privilege
+ *          http://tizen.org/privilege/healthinfo to get handles for the following sensors:
  *          #SENSOR_HRM, #SENSOR_HRM_LED_GREEN, #SENSOR_HRM_LED_IR, #SENSOR_HRM_LED_RED,
- *          #SENSOR_HUMAN_PEDOMETER, and #SENSOR_HUMAN_SLEEP_MONITOR require the privilege
- *          http://tizen.org/privilege/healthinfo.
+ *          #SENSOR_HUMAN_PEDOMETER, and #SENSOR_HUMAN_SLEEP_MONITOR.
  *
  * @param[in]  type     A sensor type to get the handle of its default sensor
  * @param[out] sensor   The sensor handle of the default sensor
@@ -334,14 +333,13 @@ int sensor_get_default_sensor(sensor_type_e type, sensor_h *sensor);
  * @privlevel   public
  * @privilege   http://tizen.org/privilege/healthinfo
  *
- * @remarks The @c list must be released using @c free().
- * @remarks If this function is called with #SENSOR_ALL,
- *          it returns the handles of all types of sensors supported in the device.
- * @remarks Some sensor types are privileged, that is, application should have
- *          the corresponding privilege to use one of them. @n
+ * @remarks Some sensor types are privileged. An application should have the privilege
+ *          http://tizen.org/privilege/healthinfo to get handles for the following sensors:
  *          #SENSOR_HRM, #SENSOR_HRM_LED_GREEN, #SENSOR_HRM_LED_IR, #SENSOR_HRM_LED_RED,
- *          #SENSOR_HUMAN_PEDOMETER, and #SENSOR_HUMAN_SLEEP_MONITOR require the privilege
- *          http://tizen.org/privilege/healthinfo.
+ *          #SENSOR_HUMAN_PEDOMETER, and #SENSOR_HUMAN_SLEEP_MONITOR.@n
+ *          Instead of specifying a sensor type, by using #SENSOR_ALL,
+ *          applications can get the list of handles for all available sensors.@n
+ *          The @c list must be released using @c free(), if not being used anymore.@n
  *
  * @param[in]  type         A sensor type to get the list of sensor handles
  * @param[out] list         An array of the sensor handles
@@ -480,13 +478,8 @@ int sensor_listener_stop(sensor_listener_h listener);
  *
  * @param[in]   listener    A listener handle
  * @param[in]   interval_ms A desired update interval between sensor events in milliseconds.@n
- *                          If 0, it will be automatically set to the default interval of the corresponding sensor.
- *                          Commonly the default interval is 100 ms, but it varies with the sensor and the device.@n
- *                          Regarding sensors, there update intervals also have valid ranges.
- *                          That is, any input values exceeding the valid range of a sensor will be
- *                          implicitly adjusted into the valid range.
- *                          The valid range of a sensor's update interval is usually from 10 ms to 1000 ms,
- *                          however, it also can varies with the sensor and the device.
+ *                          If 0, it will be automatically set to the default interval of the corresponding sensor.@n
+ *                          See sensor_listener_set_interval() for more details.
  * @param[in]   callback    A callback function to attach with the @c listener handle
  * @param[in]   data        A user data to be passed to the callback function
  *
@@ -604,20 +597,24 @@ int sensor_listener_read_data(sensor_listener_h listener, sensor_event_s *event)
  *          because the system usually chooses the shortest interval among all intervals specified.
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
+ * @remarks Normally, a sensor's default update interval is 100 ms,
+ *          and you can use the default interval by setting the interval to 0.
+ *          However, please note that, the default interval varies with the sensor and the device.@n
+ *          In addition, a sensor has the lower and the upper bound of its update interval,
+ *          usually 10 and 1000 ms respectively.
+ *          These lower and upper bounds also can vary with the sensor and the device,
+ *          any invalid input values exceeding the bounds will be implicitly adjusted into the valid range.
+ *
  * @param[in]   listener    A listener handle
- * @param[in]   interval_ms A desired update interval between sensor events in milliseconds.@n
+ * @param[in]   interval_ms A desired update interval between sensor events in milliseconds.
  *                          If 0, it will be automatically set to the default interval of the corresponding sensor.
- *                          Commonly the default interval is 100 ms, but it varies with the sensor and the device.@n
- *                          Regarding sensors, there update intervals also have valid ranges.
- *                          That is, any input values exceeding the valid range of a sensor will be
- *                          implicitly adjusted into the valid range.
- *                          The valid range of a sensor's update interval is usually from 10 ms to 1000 ms,
- *                          however, it also can varies with the sensor and the device.
  *
  * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
  * @retval  #SENSOR_ERROR_NONE                 Successful
  * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
  * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ *
+ * @see     sensor_get_min_interval()
  */
 int sensor_listener_set_interval(sensor_listener_h listener, unsigned int interval_ms);
 
