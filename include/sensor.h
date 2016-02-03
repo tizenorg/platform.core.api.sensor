@@ -300,9 +300,6 @@ int sensor_is_supported(sensor_type_e type, bool *supported);
  *          this returns only the default sensor, which is designated by the device.@n
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
- * @privlevel   public
- * @privilege   http://tizen.org/privilege/healthinfo
- *
  * @remarks Some sensor types are privileged. An application should have the privilege
  *          http://tizen.org/privilege/healthinfo to get handles for the following sensors:
  *          #SENSOR_HRM, #SENSOR_HRM_LED_GREEN, #SENSOR_HRM_LED_IR, #SENSOR_HRM_LED_RED,
@@ -329,9 +326,6 @@ int sensor_get_default_sensor(sensor_type_e type, sensor_h *sensor);
  *          The first element of the @c list denotes the default sensor,
  *          which can be retrieved by sensor_get_default_sensor().
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
- *
- * @privlevel   public
- * @privilege   http://tizen.org/privilege/healthinfo
  *
  * @remarks Some sensor types are privileged. An application should have the privilege
  *          http://tizen.org/privilege/healthinfo to get handles for the following sensors:
