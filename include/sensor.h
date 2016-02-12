@@ -618,23 +618,27 @@ int sensor_get_max_batch_count(sensor_h sensor, int *max_batch_count);
  */
 
 /**
- * @brief  Enumeration of the axis used in #sensor_util_remap_coordinate_system.
+ * @brief   Enumeration of the axis used in sensor_util_remap_coordinate_system().
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
- *
- * @see #sensor_util_remap_coordinate_system
  */
 typedef enum
 {
-    sensor_util_axis_minus_x,
-    sensor_util_axis_minus_y,
-    sensor_util_axis_minus_z,
-    sensor_util_axis_x,
-    sensor_util_axis_y,
-    sensor_util_axis_z,
+    SENSOR_UTIL_AXIS_X = 0x01,          /**< +X */
+    SENSOR_UTIL_AXIS_Y = 0x02,          /**< +Y */
+    SENSOR_UTIL_AXIS_Z = 0x03,          /**< +Z */
+    SENSOR_UTIL_AXIS_MINUS_X = 0x81,    /**< -X */
+    SENSOR_UTIL_AXIS_MINUS_Y = 0x82,    /**< -Y */
+    SENSOR_UTIL_AXIS_MINUS_Z = 0x83,    /**< -Z */
+    sensor_util_axis_x = 0x01,
+    sensor_util_axis_y = 0x02,
+    sensor_util_axis_z = 0x03,
+    sensor_util_axis_minus_x = 0x81,
+    sensor_util_axis_minus_y = 0x82,
+    sensor_util_axis_minus_z = 0x83,
 } sensor_util_axis_e;
 
 /**
- * @brief Gets the Inclination matrix "I" and Rotation matrix "R" transforming a vector from the device coordinate to the world's coordinate.
+ * @brief   Gets the inclination matrix "I" and rotation matrix "R" transforming a vector from the device coordinate to the world's coordinate.
  *
  * @details [0 0 g] = R * gravity (g = magnitude of gravity) \n
  *          [0 m 0] = I * R * geomagnetic (m = magnitude of the geomagnetic field) \n
