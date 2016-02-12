@@ -176,16 +176,16 @@ typedef enum
 	SENSOR_TEMPERATURE,                     /**< Temperature sensor */
 	SENSOR_HUMIDITY,                        /**< Humidity sensor */
 	SENSOR_HRM,                             /**< Heart-rate monitor
-	                                             @if MOBILE (Since 2.4) @endif @n
+	                                             @if MOBILE (Since 2.3.1) @endif @n
 	                                             Privilege : http://tizen.org/privilege/healthinfo */
 	SENSOR_HRM_LED_GREEN,                   /**< Green LED sensor of HRM
-	                                             @if MOBILE (Since 2.4) @endif @n
+	                                             @if MOBILE (Since 2.3.1) @endif @n
 	                                             Privilege : http://tizen.org/privilege/healthinfo */
 	SENSOR_HRM_LED_IR,                      /**< Infra-Red LED sensor of HRM
-	                                             @if MOBILE (Since 2.4) @endif @n
+	                                             @if MOBILE (Since 2.3.1) @endif @n
 	                                             Privilege : http://tizen.org/privilege/healthinfo */
 	SENSOR_HRM_LED_RED,                     /**< Red LED sensor of HRM
-	                                             @if MOBILE (Since 2.4) @endif @n
+	                                             @if MOBILE (Since 2.3.1) @endif @n
 	                                             Privilege : http://tizen.org/privilege/healthinfo */
 	SENSOR_GYROSCOPE_UNCALIBRATED,          /**< Uncalibrated Gyroscope sensor
 	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 2.3.2) @endif */
@@ -195,22 +195,6 @@ typedef enum
 	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 2.3.2) @endif */
 	SENSOR_GEOMAGNETIC_ROTATION_VECTOR,     /**< Geomagnetic-based rotation vector sensor
 	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 2.3.2) @endif */
-	SENSOR_ACTIVITY_STATIONARY = 0x100,     /**< Activity sensor detecting that the device is not moving
-	                                             @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif */
-	SENSOR_ACTIVITY_WALK,                   /**< Activity sensor detecting that the device is on a user who is walking
-	                                             @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif */
-	SENSOR_ACTIVITY_RUN,                    /**< Activity sensor detecting that the device is on a user who is running
-	                                             @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif */
-	SENSOR_ACTIVITY_IN_VEHICLE,             /**< Activity sensor detecting that the device is in a moving vehicle, like a car
-	                                             @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif */
-	SENSOR_ACTIVITY_ON_BICYCLE,             /**< Activity sensor detecting that the device is on a bicycle
-	                                             @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif */
-	SENSOR_GESTURE_MOVEMENT = 0x200,        /**< Gesture sensor detecting any significant movements
-	                                             @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif */
-	SENSOR_GESTURE_WRIST_UP,                /**< Gesture sensor detecting wrist-up gestures
-	                                             @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif */
-	SENSOR_GESTURE_WRIST_DOWN,              /**< Gesture sensor detecting wrist-down gestures
-	                                             @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif */
 	SENSOR_HUMAN_PEDOMETER = 0x300,         /**< Pedometer
 	                                             @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif
 											     @n Privilege : http://tizen.org/privilege/healthinfo */
@@ -240,13 +224,13 @@ typedef enum
 /**
  * @brief   Enumeration for sensor listener behavior attributes
  * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
- * @see     #sensor_axis_e
- * @see     #sensor_pause_e
  */
 typedef enum
 {
-	SENSOR_ATTRIBUTE_AXIS_ORIENTATION = 1,  /**< Reference orientation of sensor data to be reported */
-	SENSOR_ATTRIBUTE_PAUSE_POLICY,          /**< Pause-and-resume policy of sensors */
+	SENSOR_ATTRIBUTE_AXIS_ORIENTATION = 1,  /**< Reference orientation of sensor data to be reported.@n
+											     See #sensor_axis_e for available attribute values. */
+	SENSOR_ATTRIBUTE_PAUSE_POLICY,          /**< Pause-and-resume policy of sensors.@n
+											     See #sensor_pause_e for available attribute values. */
 } sensor_attribute_e;
 
 
