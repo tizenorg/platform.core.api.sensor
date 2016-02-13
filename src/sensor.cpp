@@ -305,7 +305,7 @@ int sensor_listener_stop(sensor_listener_h listener)
 
 static void sensor_callback(sensor_t sensor, unsigned int event_type, sensor_data_t *data, void *user_data)
 {
-	sensor_event_s event;
+	sensor_event_s *event;
 	sensor_listener_h listener;
 	listener = (sensor_listener_h)user_data;
 
@@ -313,14 +313,9 @@ static void sensor_callback(sensor_t sensor, unsigned int event_type, sensor_dat
 	if (!sensor || !listener->callback)
 		return;
 
-	event.accuracy = data->accuracy;
-	event.timestamp = data->timestamp;
-	event.value_count = data->value_count;
+	event = (sensor_event_s *)data;
 
-	for (int i = 0; i < data->value_count; ++i)
-		event.values[i] = data->values[i];
-
-	((sensor_event_cb) listener->callback)(sensor, &event, listener->user_data);
+	((sensor_event_cb) listener->callback)(sensor, event, listener->user_data);
 	return;
 }
 
