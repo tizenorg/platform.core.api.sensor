@@ -54,6 +54,8 @@
  *  - http://tizen.org/feature/sensor.magnetometer.uncalibrated\n
  *  - http://tizen.org/feature/sensor.gyroscope_rotation_vector\n
  *  - http://tizen.org/feature/sensor.geomagnetic_rotation_vector\n
+ *  - http://tizen.org/feature/sensor.pedometer\n
+ *  - http://tizen.org/feature/sensor.sleep_monitor\n
  *
  * It is recommended to design feature related codes in your application for reliability.\n
  *
@@ -96,6 +98,8 @@
  *  - http://tizen.org/feature/sensor.magnetometer.uncalibrated\n
  *  - http://tizen.org/feature/sensor.gyroscope_rotation_vector\n
  *  - http://tizen.org/feature/sensor.geomagnetic_rotation_vector\n
+ *  - http://tizen.org/feature/sensor.pedometer\n
+ *  - http://tizen.org/feature/sensor.sleep_monitor\n
  *
  * It is recommended to design feature related codes in your application for reliability.\n
  *
@@ -137,6 +141,8 @@
  *  - http://tizen.org/feature/sensor.magnetometer.uncalibrated\n
  *  - http://tizen.org/feature/sensor.gyroscope_rotation_vector\n
  *  - http://tizen.org/feature/sensor.geomagnetic_rotation_vector\n
+ *  - http://tizen.org/feature/sensor.pedometer\n
+ *  - http://tizen.org/feature/sensor.sleep_monitor\n
  *
  * It is recommended to design feature related codes in your application for reliability.\n
  *
