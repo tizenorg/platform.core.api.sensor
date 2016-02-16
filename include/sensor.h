@@ -134,7 +134,7 @@ typedef enum
  */
 typedef enum
 {
-	SENSOR_PEDOMETER_STATE_UNKNOWN = 0, /**< Uncertain */
+	SENSOR_PEDOMETER_STATE_UNKNOWN = -1, /**< Uncertain */
 	SENSOR_PEDOMETER_STATE_STOP,        /**< The user is not moving */
 	SENSOR_PEDOMETER_STATE_WALK,        /**< The user is walking */
 	SENSOR_PEDOMETER_STATE_RUN,         /**< The user is running */
@@ -149,9 +149,9 @@ typedef enum
  */
 typedef enum
 {
-	SENSOR_SLEEP_STATE_UNKNOWN = 0, /**< Uncertain */
-	SENSOR_SLEEP_STATE_SLEEP,       /**< The user is asleep */
-	SENSOR_SLEEP_STATE_AWAKE,       /**< The user is awake */
+	SENSOR_SLEEP_STATE_UNKNOWN = -1, /**< Uncertain */
+	SENSOR_SLEEP_STATE_WAKE,         /**< The user is awake */
+	SENSOR_SLEEP_STATE_SLEEP,        /**< The user is asleep */
 } sensor_sleep_state_e;
 
 
