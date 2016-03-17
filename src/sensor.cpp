@@ -512,7 +512,27 @@ int sensor_listener_set_max_batch_latency(sensor_listener_h listener, unsigned i
 
 int sensor_listener_set_attribute_int(sensor_listener_h listener, sensor_attribute_e attribute, int value)
 {
-	return SENSOR_ERROR_NOT_SUPPORTED;
+	int id;
+
+	_D("called sensor_set_attribute_int : listener[0x%x], attribute[%d], value[%d]", listener, attribute, value);
+
+	if (!listener)
+		return SENSOR_ERROR_INVALID_PARAMETER;
+
+	if (listener->magic != SENSOR_LISTENER_MAGIC)
+		return SENSOR_ERROR_INVALID_PARAMETER;
+
+	id = listener->id;
+
+	if (!sensord_set_attribute_int(id, (int)attribute, (int)value))
+		return SENSOR_ERROR_OPERATION_FAILED;
+
+	if (attribute == SENSOR_ATTRIBUTE_PAUSE_POLICY)
+		listener->option = value;
+
+	_D("success sensor_set_attribute_int");
+
+	return SENSOR_ERROR_NONE;
 }
 
 int sensor_listener_set_option(sensor_listener_h listener, sensor_option_e option)
