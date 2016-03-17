@@ -82,7 +82,6 @@ static int sensor_connect (sensor_h sensor, sensor_listener_h listener)
 int sensor_is_supported(sensor_type_e type, bool *supported)
 {
 	sensor_t sensor;
-	bool _supported;
 
 	if (type < SENSOR_ALL)
 		return SENSOR_ERROR_INVALID_PARAMETER;
@@ -93,15 +92,14 @@ int sensor_is_supported(sensor_type_e type, bool *supported)
 	_D("called sensor_is_supported : type[%d]", type);
 
 	sensor = sensord_get_sensor((sensor_type_t)type);
-	_supported = false;
+
+	*supported = false;
 
 	if (sensor)
-		_supported = true;
-
-	*supported = _supported;
+		*supported = true;
 
 	_D("success sensor(%d) is supported[%d] : sensor[0x%x]",
-		type, _supported, sensor);
+		type, *supported, sensor);
 
 	return SENSOR_ERROR_NONE;
 }
