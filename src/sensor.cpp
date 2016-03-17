@@ -199,7 +199,16 @@ int sensor_get_sensor_list(sensor_type_e type, sensor_h **list, int *sensor_coun
 
 int sensor_is_wake_up(sensor_h sensor, bool *wakeup)
 {
-	return SENSOR_ERROR_NOT_SUPPORTED;
+	_D("called sensor_get_type");
+
+	if (!sensor || !wakeup)
+		return SENSOR_ERROR_INVALID_PARAMETER;
+
+	*wakeup = sensord_is_wakeup_supported(sensor);
+
+	_D("success sensor_is_wake_up : [%d]", *wakeup);
+
+	return SENSOR_ERROR_NONE;
 }
 
 int sensor_create_listener(sensor_h sensor, sensor_listener_h *listener)
