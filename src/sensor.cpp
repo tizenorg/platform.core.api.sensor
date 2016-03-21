@@ -82,7 +82,6 @@ static int sensor_connect (sensor_h sensor, sensor_listener_h listener)
 int sensor_is_supported(sensor_type_e type, bool *supported)
 {
 	sensor_t sensor;
-	bool _supported;
 
 	if (type < SENSOR_ALL)
 		return SENSOR_ERROR_INVALID_PARAMETER;
@@ -93,15 +92,14 @@ int sensor_is_supported(sensor_type_e type, bool *supported)
 	_D("called sensor_is_supported : type[%d]", type);
 
 	sensor = sensord_get_sensor((sensor_type_t)type);
-	_supported = false;
+
+	*supported = false;
 
 	if (sensor)
-		_supported = true;
-
-	*supported = _supported;
+		*supported = true;
 
 	_D("success sensor(%d) is supported[%d] : sensor[0x%x]",
-		type, _supported, sensor);
+		type, *supported, sensor);
 
 	return SENSOR_ERROR_NONE;
 }
@@ -201,7 +199,16 @@ int sensor_get_sensor_list(sensor_type_e type, sensor_h **list, int *sensor_coun
 
 int sensor_is_wake_up(sensor_h sensor, bool *wakeup)
 {
-	return SENSOR_ERROR_NOT_SUPPORTED;
+	_D("called sensor_get_type");
+
+	if (!sensor || !wakeup)
+		return SENSOR_ERROR_INVALID_PARAMETER;
+
+	*wakeup = sensord_is_wakeup_supported(sensor);
+
+	_D("success sensor_is_wake_up : [%d]", *wakeup);
+
+	return SENSOR_ERROR_NONE;
 }
 
 int sensor_create_listener(sensor_h sensor, sensor_listener_h *listener)
@@ -505,7 +512,32 @@ int sensor_listener_set_max_batch_latency(sensor_listener_h listener, unsigned i
 
 int sensor_listener_set_attribute_int(sensor_listener_h listener, sensor_attribute_e attribute, int value)
 {
-	return SENSOR_ERROR_NOT_SUPPORTED;
+	int id;
+	int error;
+
+	_D("called sensor_set_attribute_int : listener[0x%x], attribute[%d], value[%d]", listener, attribute, value);
+
+	if (!listener)
+		return SENSOR_ERROR_INVALID_PARAMETER;
+
+	if (listener->magic != SENSOR_LISTENER_MAGIC)
+		return SENSOR_ERROR_INVALID_PARAMETER;
+
+	id = listener->id;
+
+	error = sensord_set_attribute_int(id, (int)attribute, (int)value);
+
+	if (error == -EINVAL)
+		return SENSOR_ERROR_INVALID_PARAMETER;
+	else if (error != SENSOR_ERROR_NONE)
+		return SENSOR_ERROR_OPERATION_FAILED;
+
+	if (attribute == SENSOR_ATTRIBUTE_PAUSE_POLICY)
+		listener->option = value;
+
+	_D("success sensor_set_attribute_int");
+
+	return SENSOR_ERROR_NONE;
 }
 
 int sensor_listener_set_option(sensor_listener_h listener, sensor_option_e option)
