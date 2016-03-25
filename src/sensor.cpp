@@ -81,6 +81,7 @@ static int sensor_connect (sensor_h sensor, sensor_listener_h listener)
 
 int sensor_is_supported(sensor_type_e type, bool *supported)
 {
+	int result;
 	sensor_t sensor;
 
 	if (type < SENSOR_ALL)
@@ -91,21 +92,29 @@ int sensor_is_supported(sensor_type_e type, bool *supported)
 
 	_D("called sensor_is_supported : type[%d]", type);
 
-	sensor = sensord_get_sensor((sensor_type_t)type);
+	 result = sensord_get_sensor_ex((sensor_type_t)type, &sensor);
+
+	if (result == -EPERM)
+		return SENSOR_ERROR_OPERATION_FAILED;
 
 	*supported = false;
 
-	if (sensor)
+	/*
+	 * because is_supported() API is N/P API,
+	 * it must not returns PERMISSION_DENIED error.
+	 * -EACCES means that there is at least one sensor.
+	 */
+	if (sensor || (result == -EACCES))
 		*supported = true;
 
-	_D("success sensor(%d) is supported[%d] : sensor[0x%x]",
-		type, *supported, sensor);
+	_D("success sensor(%d) is supported[%d]", type, *supported);
 
 	return SENSOR_ERROR_NONE;
 }
 
 int sensor_get_default_sensor(sensor_type_e type, sensor_h *sensor)
 {
+	int result;
 	sensor_t _sensor;
 	sensor_privilege_t privilege;
 
@@ -117,13 +126,16 @@ int sensor_get_default_sensor(sensor_type_e type, sensor_h *sensor)
 	if (!sensor)
 		return SENSOR_ERROR_INVALID_PARAMETER;
 
-	_sensor = sensord_get_sensor((sensor_type_t)type);
+	result = sensord_get_sensor_ex((sensor_type_t)type, &_sensor);
+	if (result == -EACCES)
+		return SENSOR_ERROR_PERMISSION_DENIED;
+	else if (result == -EPERM)
+		return SENSOR_ERROR_OPERATION_FAILED;
 
 	if (!_sensor)
 		return SENSOR_ERROR_NOT_SUPPORTED;
 
 	sensord_get_privilege(_sensor, &privilege);
-
 	if (privilege != SENSOR_PRIVILEGE_PUBLIC)
 		return SENSOR_ERROR_PERMISSION_DENIED;
 
@@ -136,10 +148,11 @@ int sensor_get_default_sensor(sensor_type_e type, sensor_h *sensor)
 
 int sensor_get_sensor_list(sensor_type_e type, sensor_h **list, int *sensor_count)
 {
-	sensor_h *_list = NULL;
+	int result;
+	sensor_h *_list;
 	int count;
 
-	_D("called sensor_get_list : type[%d]");
+	_D("called sensor_get_list : type[%d]", type);
 
 	if (type < SENSOR_ALL)
 		return SENSOR_ERROR_INVALID_PARAMETER;
@@ -147,9 +160,13 @@ int sensor_get_sensor_list(sensor_type_e type, sensor_h **list, int *sensor_coun
 	if (!sensor_count || !list)
 		return SENSOR_ERROR_INVALID_PARAMETER;
 
-	sensord_get_sensor_list((sensor_type_t)type, &_list, &count);
+	result = sensord_get_sensor_list_ex((sensor_type_t)type, &_list, &count);
 
-	if (count == 0)
+	if (result == -EACCES)
+		return SENSOR_ERROR_PERMISSION_DENIED;
+	else if (result == -EPERM)
+		return SENSOR_ERROR_OPERATION_FAILED;
+	else if (result == -ENODATA)
 		return SENSOR_ERROR_NOT_SUPPORTED;
 
 	int i, j;
