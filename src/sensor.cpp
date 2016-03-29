@@ -92,7 +92,7 @@ int sensor_is_supported(sensor_type_e type, bool *supported)
 
 	_D("called sensor_is_supported : type[%d]", type);
 
-	 result = sensord_get_sensor_ex((sensor_type_t)type, &sensor);
+	 result = sensord_get_default_sensor((sensor_type_t)type, &sensor);
 
 	if (result == -EPERM)
 		return SENSOR_ERROR_OPERATION_FAILED;
@@ -126,7 +126,7 @@ int sensor_get_default_sensor(sensor_type_e type, sensor_h *sensor)
 	if (!sensor)
 		return SENSOR_ERROR_INVALID_PARAMETER;
 
-	result = sensord_get_sensor_ex((sensor_type_t)type, &_sensor);
+	result = sensord_get_default_sensor((sensor_type_t)type, &_sensor);
 	if (result == -EACCES)
 		return SENSOR_ERROR_PERMISSION_DENIED;
 	else if (result == -EPERM)
@@ -160,7 +160,7 @@ int sensor_get_sensor_list(sensor_type_e type, sensor_h **list, int *sensor_coun
 	if (!sensor_count || !list)
 		return SENSOR_ERROR_INVALID_PARAMETER;
 
-	result = sensord_get_sensor_list_ex((sensor_type_t)type, &_list, &count);
+	result = sensord_get_sensors((sensor_type_t)type, &_list, &count);
 
 	if (result == -EACCES)
 		return SENSOR_ERROR_PERMISSION_DENIED;
