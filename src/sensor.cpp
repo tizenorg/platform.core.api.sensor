@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
+#include <limits.h>
 
 #include <sensor_internal.h>
 #include <sensor.h>
@@ -42,6 +43,7 @@
 
 #define SENSOR_SHIFT_TYPE 16
 #define SENSOR_UNDEFINED_ID -1
+#define SENSOR_BATCH_LATENCY_DEFAULT UINT_MAX
 
 #define SENSOR_LISTENER_MAGIC 0xCAFECAFE
 
@@ -252,6 +254,7 @@ int sensor_create_listener(sensor_h sensor, sensor_listener_h *listener)
 
 	_listener->sensor = sensor;
 	_listener->option = SENSOR_OPTION_DEFAULT;
+	_listener->batch_latency = SENSOR_BATCH_LATENCY_DEFAULT;
 	_listener->magic = SENSOR_LISTENER_MAGIC;
 
 	*listener = (sensor_listener_h) _listener;
@@ -348,6 +351,7 @@ int sensor_listener_set_event_cb(sensor_listener_h listener,
 {
 	int id;
 	unsigned int event_id;
+	unsigned int batch_latency;
 
 	if (!listener || !callback)
 		return SENSOR_ERROR_INVALID_PARAMETER;
@@ -360,11 +364,12 @@ int sensor_listener_set_event_cb(sensor_listener_h listener,
 
 	id = listener->id;
 	event_id = (listener->type) << SENSOR_SHIFT_TYPE | 0x1;
+	batch_latency = listener->batch_latency;
 
 	listener->callback = (void *)callback;
 	listener->user_data = user_data;
 
-	if (!sensord_register_event(id, event_id, interval, 0,
+	if (!sensord_register_event(id, event_id, interval, batch_latency,
 				sensor_callback, listener)) {
 		listener->callback = NULL;
 		listener->user_data = NULL;
@@ -521,6 +526,8 @@ int sensor_listener_set_max_batch_latency(sensor_listener_h listener, unsigned i
 
 	if (!sensord_change_event_max_batch_latency(id, event_id, max_batch_latency))
 		return SENSOR_ERROR_NOT_SUPPORTED;
+
+	listener->batch_latency = max_batch_latency;
 
 	_D("success sensor_set_max_batch_latency");
 
