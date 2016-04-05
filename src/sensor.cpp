@@ -510,6 +510,7 @@ int sensor_listener_set_max_batch_latency(sensor_listener_h listener, unsigned i
 {
 	int id;
 	int type;
+	int max_batch_count;
 	unsigned int event_id;
 
 	_D("called sensor_set_max_batch_latency : listener[0x%x], max_batch_latency[%d]", listener, max_batch_latency);
@@ -519,6 +520,12 @@ int sensor_listener_set_max_batch_latency(sensor_listener_h listener, unsigned i
 
 	if (listener->magic != SENSOR_LISTENER_MAGIC)
 		return SENSOR_ERROR_INVALID_PARAMETER;
+
+	if (!sensord_get_max_batch_count(listener->sensor, &max_batch_count))
+		return SENSOR_ERROR_OPERATION_FAILED;
+
+	if (max_batch_count == 0)
+		return SENSOR_ERROR_NOT_SUPPORTED;
 
 	id = listener->id;
 	type = (int)listener->type;
