@@ -47,7 +47,7 @@
 
 #define SENSOR_LISTENER_MAGIC 0xCAFECAFE
 
-static int sensor_connect (sensor_h sensor, sensor_listener_h listener)
+static int sensor_connect(sensor_h sensor, sensor_listener_h listener)
 {
 	int id = SENSOR_UNDEFINED_ID;
 	int event_type;
@@ -769,37 +769,37 @@ int sensor_get_max_batch_count(sensor_h sensor, int *max_batch_count)
  *	FUNCTIONS : SENSOR_UTIL_*
  */
 
-int sensor_util_get_declination (float latitude, float longitude, float altitude, float *declination)
+int sensor_util_get_declination(float latitude, float longitude, float altitude, float *declination)
 {
 	if (!declination)
 		return SENSOR_ERROR_INVALID_PARAMETER;
 
-	setCoordinate (latitude, longitude, altitude, declination, NULL, 1);
+	setCoordinate(latitude, longitude, altitude, declination, NULL, 1);
 
 	return SENSOR_ERROR_NONE;
 }
 
-int sensor_util_get_angle_change (float R[], float prevR[], float angleChange[])
+int sensor_util_get_angle_change(float R[], float prevR[], float angleChange[])
 {
-	if (getAngleChange (R, prevR, angleChange) < 0)
+	if (getAngleChange(R, prevR, angleChange) < 0)
 		return SENSOR_ERROR_INVALID_PARAMETER;
 
 	return SENSOR_ERROR_NONE;
 }
 
-int sensor_util_get_orientation (float R[], float values[])
+int sensor_util_get_orientation(float R[], float values[])
 {
 	if (!R || !values)
 		return SENSOR_ERROR_INVALID_PARAMETER;
 
-	values[0] = (float) atan2 (R[1], R[4]);
-	values[1] = (float) asin (-R[7]);
-	values[2] = (float) atan2 (-R[6], R[8]);
+	values[0] = (float) atan2(R[1], R[4]);
+	values[1] = (float) asin(-R[7]);
+	values[2] = (float) atan2(-R[6], R[8]);
 
 	return SENSOR_ERROR_NONE;
 }
 
-int sensor_util_get_inclination (float I[], float* inclination)
+int sensor_util_get_inclination(float I[], float* inclination)
 {
 	if (!I || !inclination)
 		return SENSOR_ERROR_INVALID_PARAMETER;
@@ -809,20 +809,20 @@ int sensor_util_get_inclination (float I[], float* inclination)
 	return SENSOR_ERROR_NONE;
 }
 
-int sensor_util_remap_coordinate_system (float inR[], sensor_util_axis_e x, sensor_util_axis_e y, float outR[])
+int sensor_util_remap_coordinate_system(float inR[], sensor_util_axis_e x, sensor_util_axis_e y, float outR[])
 {
-	if (remapCoordinateSystem (inR, x, y, outR) < 0)
+	if (remapCoordinateSystem(inR, x, y, outR) < 0)
 		return SENSOR_ERROR_INVALID_PARAMETER;
 
 	return SENSOR_ERROR_NONE;
 }
 
-int sensor_util_get_rotation_matrix_from_vector (float Vx, float Vy, float Vz, float R[])
+int sensor_util_get_rotation_matrix_from_vector(float Vx, float Vy, float Vz, float R[])
 {
 	float RV[4] = {0, Vx, Vy, Vz};
 
-	RV[0] = 1 - Vx * Vx - Vy*Vy - Vz*Vz;
-	RV[0] = (Vx > 0) ? (float) (sqrt (Vx)) : 0;
+	RV[0] = 1 - Vx * Vx - Vy * Vy - Vz * Vz;
+	RV[0] = (Vx > 0) ? (float) (sqrt(Vx)) : 0;
 
 	if (quatToMatrix(RV, R) < 0)
 		return SENSOR_ERROR_INVALID_PARAMETER;
@@ -830,12 +830,12 @@ int sensor_util_get_rotation_matrix_from_vector (float Vx, float Vy, float Vz, f
 	return SENSOR_ERROR_NONE;
 }
 
-int sensor_util_get_rotation_matrix (float Gx, float Gy, float Gz,float Mx, float My, float Mz,float R[], float I[])
+int sensor_util_get_rotation_matrix(float Gx, float Gy, float Gz,float Mx, float My, float Mz, float R[], float I[])
 {
 	float G[3] = {Gx, Gy, Gz};
 	float M[3] = {Mx, My, Mz};
 
-	if (getRotationMatrix (G, M, R, I) < 0)
+	if (getRotationMatrix(G, M, R, I) < 0)
 		return SENSOR_ERROR_INVALID_PARAMETER;
 
 	return SENSOR_ERROR_NONE;
