@@ -32,7 +32,6 @@ const float c[13][13] = {
 	{-807.3, 238.5, 1363.4, -1217.3, 167.0, 125.0, 0.0, 5.9, 7.7, -8.5, -0.6, 0.5, 0.0, }
 };
 
-
 const float cd[13][13] = {
 	{0.0, 11.6, -18.1, 1.0, -7.9, -7.9, -2.9, 2.7, -5.0, 0.0, 0.0, 0.0, 0.0, },
 	{-25.9, 16.5, -7.6, -12.6, 12.7, 6.1, -3.8, -3.5, 6.7, -12.7, 0.0, 0.0, 0.0, },
@@ -66,12 +65,12 @@ int getDeclination(float *decl)
 
 int getInclination(float *incl)
 {
-        if (incl == NULL)
-                return -1;
+	if (incl == NULL)
+		return -1;
 
-        *incl = g_inclination;
+	*incl = g_inclination;
 
-        return 0;
+	return 0;
 }
 
 int setCoordinate(float latitude, float longitude, float altitude, float *declination, float *inclination, int option)
@@ -91,7 +90,7 @@ int setCoordinate(float latitude, float longitude, float altitude, float *declin
 		dec = 0;
 	}
 
-	if (option == 1)	{
+	if (option == 1) {
 		if (declination != NULL)
 			*declination = dec;
 		if (inclination != NULL)
@@ -109,11 +108,11 @@ static void E0000(int IENTRY, int maxdeg, float alt, float glat, float glon, flo
 {
 	static int maxord, n, m, j, D1, D2, D3, D4;
 	static float tc[13][13], dp[13][13], snorm[169],
-		      sp[13], cp[13], fn[13], fm[13], pp[13], k[13][13], pi, dtr, a, b, re,
-		      a2, b2, c2, a4, b4, c4, flnmj, otime, oalt,
-		      olat, olon, dt, rlon, rlat, srlon, srlat, crlon, crlat, srlat2,
-		      crlat2, q, q1, q2, ct, st, r2, r, d, ca, sa, aor, ar, br, bt, bp, bpp,
-		      par, temp1, temp2, parp, bx, by, bz, bh;
+			sp[13], cp[13], fn[13], fm[13], pp[13], k[13][13], pi, dtr, a, b, re,
+			a2, b2, c2, a4, b4, c4, flnmj, otime, oalt,
+			olat, olon, dt, rlon, rlat, srlon, srlat, crlon, crlat, srlat2,
+			crlat2, q, q1, q2, ct, st, r2, r, d, ca, sa, aor, ar, br, bt, bp, bpp,
+			par, temp1, temp2, parp, bx, by, bz, bh;
 	static float *p = snorm;
 
 	switch (IENTRY) {case 0: goto GEOMAG; case 1: goto GEOMG1; }
