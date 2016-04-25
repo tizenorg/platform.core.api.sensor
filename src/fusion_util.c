@@ -130,9 +130,9 @@ int getRotationMatrix(float *accel, float *geo, float *R, float *I)
 	float Hy = Ez*Ax - Ex*Az;
 	float Hz = Ex*Ay - Ey*Ax;
 	float normH =  (float)sqrt(Hx*Hx + Hy*Hy + Hz*Hz);
-	if (normH < 0.1f) {
+	if (normH < 0.1f)
 		return -1;
-	}
+
 	float invH = 1.0f / normH;
 	Hx *= invH;
 	Hy *= invH;
