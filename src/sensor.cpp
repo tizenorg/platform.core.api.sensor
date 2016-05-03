@@ -47,6 +47,8 @@
 
 #define SENSOR_LISTENER_MAGIC 0xCAFECAFE
 
+#define CONVERT_AXIS_ENUM(X) ((X) < 3 ? (X) + 0x81 : (X) - 2)
+
 static int sensor_connect(sensor_h sensor, sensor_listener_h listener)
 {
 	int id = SENSOR_UNDEFINED_ID;
@@ -811,7 +813,7 @@ int sensor_util_get_inclination(float I[], float* inclination)
 
 int sensor_util_remap_coordinate_system(float inR[], sensor_util_axis_e x, sensor_util_axis_e y, float outR[])
 {
-	if (remapCoordinateSystem(inR, x, y, outR) < 0)
+	if (remapCoordinateSystem(inR, CONVERT_AXIS_ENUM(x), CONVERT_AXIS_ENUM(y), outR) < 0)
 		return SENSOR_ERROR_INVALID_PARAMETER;
 
 	return SENSOR_ERROR_NONE;

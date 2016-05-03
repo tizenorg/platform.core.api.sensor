@@ -859,18 +859,18 @@ int sensor_get_max_batch_count(sensor_h sensor, int *max_batch_count);
  */
 typedef enum
 {
-    SENSOR_UTIL_AXIS_X = 0x01,          /**< +X */
-    SENSOR_UTIL_AXIS_Y = 0x02,          /**< +Y */
-    SENSOR_UTIL_AXIS_Z = 0x03,          /**< +Z */
-    SENSOR_UTIL_AXIS_MINUS_X = 0x81,    /**< -X */
-    SENSOR_UTIL_AXIS_MINUS_Y = 0x82,    /**< -Y */
-    SENSOR_UTIL_AXIS_MINUS_Z = 0x83,    /**< -Z */
-    sensor_util_axis_x = 0x01,
-    sensor_util_axis_y = 0x02,
-    sensor_util_axis_z = 0x03,
-    sensor_util_axis_minus_x = 0x81,
-    sensor_util_axis_minus_y = 0x82,
-    sensor_util_axis_minus_z = 0x83,
+    SENSOR_UTIL_AXIS_MINUS_X = 0,  /**< -X */
+    SENSOR_UTIL_AXIS_MINUS_Y,      /**< -Y */
+    SENSOR_UTIL_AXIS_MINUS_Z,      /**< -Z */
+    SENSOR_UTIL_AXIS_X,            /**< +X */
+    SENSOR_UTIL_AXIS_Y,            /**< +Y */
+    SENSOR_UTIL_AXIS_Z,            /**< +Z */
+    sensor_util_axis_minus_x = SENSOR_UTIL_AXIS_MINUS_X,
+    sensor_util_axis_minus_y,
+    sensor_util_axis_minus_z,
+    sensor_util_axis_x,
+    sensor_util_axis_y,
+    sensor_util_axis_z,
 } sensor_util_axis_e;
 
 /**
