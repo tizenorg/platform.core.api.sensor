@@ -130,7 +130,7 @@ typedef enum
  * @brief   Enumeration for pedestrian state.
  * @details In its #sensor_event_s, #SENSOR_HUMAN_PEDOMETER reports the user's
  *          pedestrian state as one of the followings.
- * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ * @since_tizen 3.0
  */
 typedef enum
 {
@@ -145,7 +145,7 @@ typedef enum
  * @brief   Enumeration for sleep state.
  * @details In its #sensor_event_s, #SENSOR_HUMAN_SLEEP_MONITOR reports the user's
  *          sleep state as one of the followings.
- * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ * @since_tizen 3.0
  */
 typedef enum
 {
@@ -175,31 +175,25 @@ typedef enum
 	SENSOR_ULTRAVIOLET,                     /**< Ultraviolet sensor */
 	SENSOR_TEMPERATURE,                     /**< Temperature sensor */
 	SENSOR_HUMIDITY,                        /**< Humidity sensor */
-	SENSOR_HRM,                             /**< Heart-rate monitor
-	                                             @if MOBILE (Since 2.3.1) @endif @n
-	                                             Privilege : http://tizen.org/privilege/healthinfo */
-	SENSOR_HRM_LED_GREEN,                   /**< Green LED sensor of HRM
-	                                             @if MOBILE (Since 2.3.1) @endif @n
-	                                             Privilege : http://tizen.org/privilege/healthinfo */
-	SENSOR_HRM_LED_IR,                      /**< Infra-Red LED sensor of HRM
-	                                             @if MOBILE (Since 2.3.1) @endif @n
-	                                             Privilege : http://tizen.org/privilege/healthinfo */
-	SENSOR_HRM_LED_RED,                     /**< Red LED sensor of HRM
-	                                             @if MOBILE (Since 2.3.1) @endif @n
-	                                             Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HRM,                             /**< Heart-rate monitor (Since 2.3.1)
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HRM_LED_GREEN,                   /**< Green LED sensor of HRM (Since 2.3.1)
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HRM_LED_IR,                      /**< Infra-Red LED sensor of HRM (Since 2.3.1)
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HRM_LED_RED,                     /**< Red LED sensor of HRM (Since 2.3.1)
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
 	SENSOR_GYROSCOPE_UNCALIBRATED,          /**< Uncalibrated Gyroscope sensor
-	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 2.3.2) @endif */
+	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 3.0) @endif */
 	SENSOR_GEOMAGNETIC_UNCALIBRATED,        /**< Uncalibrated Geomagnetic sensor
-	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 2.3.2) @endif */
+	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 3.0) @endif */
 	SENSOR_GYROSCOPE_ROTATION_VECTOR,       /**< Gyroscope-based rotation vector sensor
-	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 2.3.2) @endif */
+	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 3.0) @endif */
 	SENSOR_GEOMAGNETIC_ROTATION_VECTOR,     /**< Geomagnetic-based rotation vector sensor
-	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 2.3.2) @endif */
-	SENSOR_HUMAN_PEDOMETER = 0x300,         /**< Pedometer
-	                                             @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif
+	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 3.0) @endif */
+	SENSOR_HUMAN_PEDOMETER = 0x300,         /**< Pedometer (Since 3.0)
 	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
 	SENSOR_HUMAN_SLEEP_MONITOR,             /**< Sleep monitor (Since 3.0)
-	                                             @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif
 	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
 	SENSOR_LAST,                            /**< End of sensor enum values (Deprecated since 3.0) */
 	SENSOR_CUSTOM = 0x2710,                 /**< Custom sensor (Deprecated since 3.0) */
@@ -223,7 +217,7 @@ typedef enum
 
 /**
  * @brief   Enumeration for sensor listener behavior attributes
- * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ * @since_tizen 3.0
  */
 typedef enum
 {
@@ -247,7 +241,7 @@ typedef enum
  *          By default, #SENSOR_AXIS_DISPLAY_ORIENTED is used.
  *          If you need to use the data that are not affected by display orientations,
  *          #SENSOR_AXIS_DEVICE_ORIENTED needs to be set.
- * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ * @since_tizen 3.0
  */
 typedef enum
 {
@@ -261,7 +255,7 @@ typedef enum
  * @details To be power-efficient, you can set the policy of how to pause and resume
  *          a sensor listener regarding the system status.
  *          By default, #SENSOR_PAUSE_ALL is used to obtain the maximum power efficiency.
- * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ * @since_tizen 3.0
  */
 typedef enum
 {
@@ -349,7 +343,7 @@ int sensor_get_sensor_list(sensor_type_e type, sensor_h **list, int *sensor_coun
  * @brief   Checks whether a given sensor is a wake-up sensor or not.
  * @details If a sensor is a wake-up sensor, the sensor is able to wake-up the system
  *          to report its sensor data even if the system is in sleep mode.
- * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ * @since_tizen 3.0
  *
  * @param[in]   sensor  A sensor handle to check
  * @param[out]  wakeup  If the sensor is a wake-up sensor, @c true;
@@ -639,7 +633,7 @@ int sensor_listener_set_max_batch_latency(sensor_listener_h listener, unsigned i
  *          what is the reference coordinate of the sensor values,
  *          and when the system is allowed to turn off the sensor implicitly to reduce the power consumption.
  *          See #sensor_attribute_e for more details about the available control parameters.
- * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ * @since_tizen 3.0
  *
  * @param[in]   listener	A listener handle
  * @param[in]   attribute	An attribute to change
