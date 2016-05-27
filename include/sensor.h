@@ -108,8 +108,10 @@ typedef enum
 	SENSOR_ERROR_NOT_SUPPORTED         = TIZEN_ERROR_NOT_SUPPORTED,        /**< Not supported */
 	SENSOR_ERROR_PERMISSION_DENIED     = TIZEN_ERROR_PERMISSION_DENIED,    /**< Permission denied */
 	SENSOR_ERROR_OUT_OF_MEMORY         = TIZEN_ERROR_OUT_OF_MEMORY,        /**< Out of memory */
+	SENSOR_ERROR_NO_DATA               = TIZEN_ERROR_NO_DATA,              /**< No data available */
 	SENSOR_ERROR_NOT_NEED_CALIBRATION  = TIZEN_ERROR_SENSOR | 0x03,        /**< Sensor doesn't need calibration */
 	SENSOR_ERROR_OPERATION_FAILED      = TIZEN_ERROR_SENSOR | 0x06,        /**< Operation failed */
+	SENSOR_ERROR_ALREADY_STARTED       = TIZEN_ERROR_SENSOR | 0x07,        /**< Sensor is already started */
 } sensor_error_e;
 
 
@@ -193,7 +195,15 @@ typedef enum
 	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 3.0) @endif */
 	SENSOR_HUMAN_PEDOMETER = 0x300,         /**< Pedometer (Since 3.0)
 	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
-	SENSOR_HUMAN_SLEEP_MONITOR,             /**< Sleep monitor (Since 3.0)
+	SENSOR_HUMAN_SLEEP_MONITOR = 0x301,     /**< Sleep monitor (Since 3.0)
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HUMAN_SLEEP_DETECTOR = 0x1A04,   /**< Sleep detector (Since 3.0)
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HUMAN_EXERCISE_MONITOR = 0x400,  /**< Exercise monitor (Since 3.0)
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HUMAN_STRESS_MONITOR = 0x1A87,   /**< Stress monitor (Since 3.0)
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HUMAN_STAIR_TRACKER = 0x1A89,    /**< Stair tracker (Since 3.0)
 	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
 	SENSOR_LAST,                            /**< End of sensor enum values (Deprecated since 3.0) */
 	SENSOR_CUSTOM = 0x2710,                 /**< Custom sensor (Deprecated since 3.0) */
@@ -264,7 +274,6 @@ typedef enum
 	SENSOR_PAUSE_ON_POWERSAVE_MODE = 2, /**< The sensor pauses while the power-save mode is enabled */
 	SENSOR_PAUSE_ALL = 3,               /**< The sensor pauses in all the above cases */
 } sensor_pause_e;
-
 
 /**
  * @brief   Checks whether a given sensor type is supported in the current device.
