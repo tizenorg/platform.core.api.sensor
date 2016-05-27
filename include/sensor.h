@@ -108,8 +108,10 @@ typedef enum
 	SENSOR_ERROR_NOT_SUPPORTED         = TIZEN_ERROR_NOT_SUPPORTED,        /**< Not supported */
 	SENSOR_ERROR_PERMISSION_DENIED     = TIZEN_ERROR_PERMISSION_DENIED,    /**< Permission denied */
 	SENSOR_ERROR_OUT_OF_MEMORY         = TIZEN_ERROR_OUT_OF_MEMORY,        /**< Out of memory */
+	SENSOR_ERROR_NO_DATA               = TIZEN_ERROR_NO_DATA,              /**< No data available */
 	SENSOR_ERROR_NOT_NEED_CALIBRATION  = TIZEN_ERROR_SENSOR | 0x03,        /**< Sensor doesn't need calibration */
 	SENSOR_ERROR_OPERATION_FAILED      = TIZEN_ERROR_SENSOR | 0x06,        /**< Operation failed */
+	SENSOR_ERROR_NOT_AVAILABLE         = TIZEN_ERROR_SENSOR | 0x07,        /**< The sensor is supported, but currently not available */
 } sensor_error_e;
 
 
@@ -184,16 +186,42 @@ typedef enum
 	SENSOR_HRM_LED_RED,                     /**< Red LED sensor of HRM @if MOBILE (Since 2.3.1) @endif
 	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
 	SENSOR_GYROSCOPE_UNCALIBRATED,          /**< Uncalibrated Gyroscope sensor
-	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 3.0) @endif */
+	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 2.3.2) @endif */
 	SENSOR_GEOMAGNETIC_UNCALIBRATED,        /**< Uncalibrated Geomagnetic sensor
-	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 3.0) @endif */
+	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 2.3.2) @endif */
 	SENSOR_GYROSCOPE_ROTATION_VECTOR,       /**< Gyroscope-based rotation vector sensor
-	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 3.0) @endif */
+	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 2.3.2) @endif */
 	SENSOR_GEOMAGNETIC_ROTATION_VECTOR,     /**< Geomagnetic-based rotation vector sensor
-	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 3.0) @endif */
-	SENSOR_HUMAN_PEDOMETER = 0x300,         /**< Pedometer (Since 3.0)
+	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 2.3.2) @endif */
+	SENSOR_HUMAN_PEDOMETER = 0x300,         /**< Pedometer
+	                                             @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif
 	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
-	SENSOR_HUMAN_SLEEP_MONITOR,             /**< Sleep monitor (Since 3.0)
+	SENSOR_HUMAN_SLEEP_MONITOR,             /**< Sleep monitor
+	                                             @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HUMAN_SLEEP_DETECTOR,            /**< Sleep detector
+	                                             @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HUMAN_STRESS_MONITOR,            /**< Stress monitor
+	                                             @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_EXERCISE_WALKING = 0x400,        /**< Walking exercise monitor (Since 3.0)
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_EXERCISE_RUNNING,                /**< Running exercise monitor (Since 3.0)
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_EXERCISE_HIKING,                 /**< Hiking exercise monitor (Since 3.0)
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_EXERCISE_CYCLING,                /**< Cycling exercise monitor (Since 3.0)
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_EXERCISE_STAIR_CLIMBING,         /**< Stair climbing exercise monitor (Since 3.0)
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_EXERCISE_ELLIPTICAL,             /**< Elliptical workout monitor (Since 3.0)
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_EXERCISE_INDOOR_CYCLING,         /**< Indoor cycling workout monitor (Since 3.0)
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_EXERCISE_ROWING,                 /**< Rowing machine workout monitor (Since 3.0)
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_EXERCISE_STEPPER,                /**< Stepper workout monitor (Since 3.0)
 	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
 	SENSOR_LAST,                            /**< End of sensor enum values (Deprecated since 3.0) */
 	SENSOR_CUSTOM = 0x2710,                 /**< Custom sensor (Deprecated since 3.0) */
