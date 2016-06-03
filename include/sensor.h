@@ -18,6 +18,7 @@
 #define __SENSOR_H__
 
 #include <tizen.h>
+#include <time.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -53,8 +54,12 @@ typedef enum
 	SENSOR_ERROR_NOT_SUPPORTED         = TIZEN_ERROR_NOT_SUPPORTED,        /**< Not supported */
 	SENSOR_ERROR_PERMISSION_DENIED     = TIZEN_ERROR_PERMISSION_DENIED,    /**< Permission denied */
 	SENSOR_ERROR_OUT_OF_MEMORY         = TIZEN_ERROR_OUT_OF_MEMORY,        /**< Out of memory */
+	SENSOR_ERROR_NO_DATA               = TIZEN_ERROR_NO_DATA,              /**< No data available
+                                                                                @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif */
 	SENSOR_ERROR_NOT_NEED_CALIBRATION  = TIZEN_ERROR_SENSOR | 0x03,        /**< Sensor doesn't need calibration */
 	SENSOR_ERROR_OPERATION_FAILED      = TIZEN_ERROR_SENSOR | 0x06,        /**< Operation failed */
+	SENSOR_ERROR_NOT_AVAILABLE         = TIZEN_ERROR_SENSOR | 0x07,        /**< The sensor is supported, but currently not available
+                                                                                @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif */
 } sensor_error_e;
 
 
@@ -80,9 +85,9 @@ typedef enum
 typedef enum
 {
 	SENSOR_PEDOMETER_STATE_UNKNOWN = -1, /**< Uncertain */
-	SENSOR_PEDOMETER_STATE_STOP,        /**< The user is not moving */
-	SENSOR_PEDOMETER_STATE_WALK,        /**< The user is walking */
-	SENSOR_PEDOMETER_STATE_RUN,         /**< The user is running */
+	SENSOR_PEDOMETER_STATE_STOP,         /**< The user is not moving */
+	SENSOR_PEDOMETER_STATE_WALK,         /**< The user is walking */
+	SENSOR_PEDOMETER_STATE_RUN,          /**< The user is running */
 } sensor_pedometer_state_e;
 
 
@@ -142,6 +147,12 @@ typedef enum
 	SENSOR_HUMAN_SLEEP_MONITOR,             /**< Sleep monitor
 	                                             @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif
 	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HUMAN_SLEEP_DETECTOR,            /**< Sleep detector
+	                                             @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
+	SENSOR_HUMAN_STRESS_MONITOR,            /**< Stress monitor
+	                                             @if MOBILE (Since 3.0) @elseif WEARABLE (Since 2.3.2) @endif
+	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
 	SENSOR_LAST,                            /**< End of sensor enum values (Deprecated since 3.0) */
 	SENSOR_CUSTOM = 0x2710,                 /**< Custom sensor (Deprecated since 3.0) */
 } sensor_type_e;
@@ -193,7 +204,8 @@ int sensor_is_wake_up(sensor_h sensor, bool *wakeup);
  * @remarks Some sensor types are privileged. An application should have the privilege
  *          http://tizen.org/privilege/healthinfo to get handles for the following sensors:
  *          #SENSOR_HRM, #SENSOR_HRM_LED_GREEN, #SENSOR_HRM_LED_IR, #SENSOR_HRM_LED_RED,
- *          #SENSOR_HUMAN_PEDOMETER, and #SENSOR_HUMAN_SLEEP_MONITOR.
+ *          #SENSOR_HUMAN_PEDOMETER, #SENSOR_HUMAN_SLEEP_MONITOR, #SENSOR_HUMAN_SLEEP_DETECTOR,
+ *          and #SENSOR_HUMAN_STRESS_MONITOR.
  *
  * @param[in]  type     A sensor type to get the handle of its default sensor
  * @param[out] sensor   The sensor handle of the default sensor
@@ -220,7 +232,8 @@ int sensor_get_default_sensor(sensor_type_e type, sensor_h *sensor);
  * @remarks Some sensor types are privileged. An application should have the privilege
  *          http://tizen.org/privilege/healthinfo to get handles for the following sensors:
  *          #SENSOR_HRM, #SENSOR_HRM_LED_GREEN, #SENSOR_HRM_LED_IR, #SENSOR_HRM_LED_RED,
- *          #SENSOR_HUMAN_PEDOMETER, and #SENSOR_HUMAN_SLEEP_MONITOR.@n
+ *          #SENSOR_HUMAN_PEDOMETER, #SENSOR_HUMAN_SLEEP_MONITOR, #SENSOR_HUMAN_SLEEP_DETECTOR,
+ *          and #SENSOR_HUMAN_STRESS_MONITOR.@n
  *          Instead of specifying a sensor type, by using #SENSOR_ALL,
  *          applications can get the list of handles for all available sensors.@n
  *          The @c list must be released using @c free(), if not being used anymore.@n
@@ -838,6 +851,384 @@ int sensor_listener_set_attribute_int(sensor_listener_h listener, sensor_attribu
  * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
  */
 int sensor_listener_set_option(sensor_listener_h listener, sensor_option_e option);
+
+/**
+ * @}
+ */
+
+/**
+ * @addtogroup CAPI_SYSTEM_SENSOR_RECORDER_MODULE
+ * @{
+ */
+
+/**
+ * @brief   Option handle to contain recording policies and parameters.
+ * @details one or more sensor options can be created by using sensor_recorder_create_option().
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ */
+typedef void *sensor_recorder_option_h;
+
+/**
+ * @brief   Query handle to contain filtering and aggregation parameters for recorded data.
+ * @details one or more sensor options can be created by using sensor_recorder_create_query().
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ */
+typedef void *sensor_recorder_query_h;
+
+/**
+ * @brief   Data handle to contain retrieved sensor records.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ */
+typedef void *sensor_recorder_data_h;
+
+/*
+ * @brief   Enumeration for option parameters for sensor recording.
+ * @details None, one, or more option parameters can be set to #sensor_recorder_option_h,
+ *          then applications can request to record a specific sensor with the parameters via
+ *          sensor_recorder_start().
+ *          If a parameter is not supported for the specified sensor type, it will be ignored.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ */
+typedef enum
+{
+	SENSOR_RECORDER_OPTION_RETENTION_PERIOD,      /**< Desired retention period for the recorded sensor data (hours); int; */
+	SENSOR_RECORDER_OPTION_INTERVAL,              /**< Desired interval between data records (minutes); int; see #sensor_recorder_interval_e */
+} sensor_recorder_option_e;
+
+/*
+ * @brief   Enumeration for intervals between data records.
+ * @details Some sensor types including #SENSOR_HRM may not fit to continuous monitoring and recording.
+ *          To reduce the battery use for recoridng such sensors, recording interval between each
+ *          sensor data is chosen. For example, an application set the interval of 1 hour,
+ *          the platform tries to retrieve the sensor data only once per hour, thus it will be more
+ *          battery efficient than to listen the sensor data continuously.@n
+ *          If the application does not set the interval explicitely, the default value is chosen.
+ *          The default values are differ from sensor to sensor.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ * @remarks If more than one applications set different intervals, the shortest value is chosen.
+ */
+typedef enum
+{
+	SENSOR_RECORDER_INTERVAL_10_MINUTES = 10,   /**< 10 Minutes */
+	SENSOR_RECORDER_INTERVAL_1_HOUR = 60,       /**< 1 Hour */
+	SENSOR_RECORDER_INTERVAL_3_HOURS = 180,     /**< 3 Hours */
+	SENSOR_RECORDER_INTERVAL_6_HOURS = 360,     /**< 6 Hours */
+	SENSOR_RECORDER_INTERVAL_12_HOURS = 720,    /**< 12 Hours */
+	SENSOR_RECORDER_INTERVAL_1_DAY = 1440,      /**< 1 Day */
+} sensor_recorder_interval_e;
+
+/*
+ * @brief   Enumeration for filtering and aggregation parameters for queyring sensor records.
+ * @details None, one, or more query parameters can be set to #sensor_recorder_query_h,
+ *          to specify the data to be retrieved via sensor_recorder_read().
+ *          If a necessary parameter is not set, the default value is chosen.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ */
+typedef enum
+{
+	SENSOR_RECORDER_QUERY_START_TIME = 0,   /**< Start time of the data to be queried (Epoch); time_t; If unspecified, 1 day ago */
+	SENSOR_RECORDER_QUERY_END_TIME,         /**< End time of the data to be queried (Epoch); time_t; If unspecified, the current time */
+	SENSOR_RECORDER_QUERY_ANCHOR_TIME,      /**< The anchor time to slice the querying duration of time (Epoch); time_t;
+	                                             It needs to be set with #SENSOR_RECORDER_QUERY_TIME_INTERVAL, otherwise, it is ignored */
+	SENSOR_RECORDER_QUERY_TIME_INTERVAL,    /**< The interval of each sliced querying duration (minutes); int */
+} sensor_recorder_query_e;
+
+/*
+ * @brief   Enumeration for data attributes can be contained in #sensor_recorder_data_h.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ * @see     sensor_recorder_data_get_int()
+ * @see     sensor_recorder_data_get_double()
+ */
+typedef enum
+{
+	SENSOR_RECORDER_DATA_STEPS = 0x00,           /**< Count of both walking and running steps; int */
+	SENSOR_RECORDER_DATA_WALK_STEPS,             /**< Count of walking steps; int */
+	SENSOR_RECORDER_DATA_RUN_STEPS,              /**< Count of running steps; int */
+	SENSOR_RECORDER_DATA_DISTANCE,               /**< Distance walked or ran (m); double */
+	SENSOR_RECORDER_DATA_CALORIE,                /**< Calorie burned (kcal); double */
+	SENSOR_RECORDER_DATA_HEART_RATE = 0x10,      /**< Heart Rate (BPM); int */
+	SENSOR_RECORDER_DATA_SLEEP_STATE = 0x20,     /**< Sleep state; int; One of #sensor_sleep_state_e */
+	SENSOR_RECORDER_DATA_PRESSURE = 0x30,        /**< Pressure; double */
+	SENSOR_RECORDER_DATA_MAX_PRESSURE,           /**< Max pressure; double */
+	SENSOR_RECORDER_DATA_MIN_PRESSURE,           /**< Min pressure; double */
+	SENSOR_RECORDER_DATA_AVERAGE_PRESSURE,       /**< Average pressure; double */
+} sensor_recorder_data_e;
+
+/**
+ * @brief   Checks whether it is suppored to record a given sensor type.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ *
+ * @param[in]   type        A sensor type to check
+ * @param[out]  supported   If supported, @c true; Otherwise @c false
+ *
+ * @return  #SENSOR_ERROR_NONE on success; Otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ */
+int sensor_recorder_is_supported(sensor_type_e type, bool *supported);
+
+/**
+ * @brief   Starts to record a given sensor type.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ *
+ * @remarks Some sensor types are privileged. An application should have the privilege
+ *          http://tizen.org/privilege/healthinfo to get access to the following sensors:
+ *          #SENSOR_HRM, #SENSOR_HRM_LED_GREEN, #SENSOR_HRM_LED_IR, #SENSOR_HRM_LED_RED,
+ *          #SENSOR_HUMAN_PEDOMETER, #SENSOR_HUMAN_SLEEP_MONITOR, #SENSOR_HUMAN_SLEEP_DETECTOR,
+ *          and #SENSOR_HUMAN_STRESS_MONITOR.
+ *
+ * @param[in]  type    A sensor type to be recorded
+ * @param[in]  option  Option
+ *
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_NOT_SUPPORTED        Not supported to record the sensor type
+ * @retval  #SENSOR_ERROR_PERMISSION_DENIED    Permission denied
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ * @retval  #SENSOR_ERROR_NOT_AVAILABLE        The sensor is already being recorded by the request of the current application
+ *
+ * @see sensor_recorder_stop()
+ */
+int sensor_recorder_start(sensor_type_e type, sensor_recorder_option_h option);
+
+/**
+ * @brief   Stops recording a given sensor type.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ *
+ * @param[in]  type    A sensor type being recorded
+ *
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_NOT_SUPPORTED        The sensor type is not supported
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ *
+ * @see sensor_recorder_start()
+ */
+int sensor_recorder_stop(sensor_type_e type);
+
+/**
+ * @brief   Creates a recorder option handle.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ *
+ * @remarks The @a option must be released using sensor_recorder_destroy_option().
+ *
+ * @param[out]  option  Option handle
+ *
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OUT_OF_MEMORY        Out of memory
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ */
+int sensor_recorder_create_option(sensor_recorder_option_h *option);
+
+/**
+ * @brief   Destroys a recorder option handle.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ *
+ * @param[in]  option  Option handle
+ *
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ */
+int sensor_recorder_destroy_option(sensor_recorder_option_h option);
+
+/**
+ * @brief   Sets a recording option parameter.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ *
+ * @param[in]  option      Option handle
+ * @param[in]  param       Option parameter
+ * @param[in]  value       Value
+ *
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ */
+int sensor_recorder_option_set_int(sensor_recorder_option_h option, sensor_recorder_option_e param, int value);
+
+/**
+ * @brief   Creates a recorder query handle.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ *
+ * @remarks The @a query must be released using sensor_recorder_destroy_query().
+ *
+ * @param[out]  query  Query handle
+ *
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OUT_OF_MEMORY        Out of memory
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ */
+int sensor_recorder_create_query(sensor_recorder_query_h *query);
+
+/**
+ * @brief   Destroys a recorder query handle.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ *
+ * @param[in]  query  Query handle
+ *
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ */
+int sensor_recorder_destroy_query(sensor_recorder_query_h query);
+
+/**
+ * @brief   Sets an integer-type query parameter
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ *
+ * @param[in]  query       Query handle
+ * @param[in]  param       Query parameter
+ * @param[in]  value       Value
+ *
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ */
+int sensor_recorder_query_set_int(sensor_recorder_query_h query, sensor_recorder_query_e param, int value);
+
+/**
+ * @brief   Sets a time-type query parameter.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ *
+ * @param[in]  query       Query handle
+ * @param[in]  param       Query parameter
+ * @param[in]  t           Time
+ *
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ */
+int sensor_recorder_query_set_time(sensor_recorder_query_h query, sensor_recorder_query_e param, time_t t);
+
+/**
+ * @brief   Called when the query results are retieved.
+ * @details One of the following errors can be delivered.\n
+ *          #SENSOR_ERROR_NONE, Successful\n
+ *          #SENSOR_ERROR_OPERATION_FAILED, Operation failed\n
+ *          #SENSOR_ERROR_NO_DATA, No data retrieved.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ *
+ * @param[in]  type        Sensor type
+ * @param[in]  data        Retrieved data record
+ * @param[in]  remains     Number of remaining records to be delivered
+ * @param[in]  error       Error
+ * @param[in]  user_data   The user data passed from sensor_recorder_read() or sensor_recorder_read_sync()
+ *
+ * @return  If @c true, it continues to iterate to the next record; If @c false, the iteration stops
+ */
+typedef bool (*sensor_recorder_data_cb)(sensor_type_e type, sensor_recorder_data_h data, int remains, sensor_error_e error, void *user_data);
+
+/**
+ * @brief    Queries the recorded data asynchronously.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ *
+ * @remarks Some sensor types are privileged. An application should have the privilege
+ *          http://tizen.org/privilege/healthinfo to get access to the following sensors:
+ *          #SENSOR_HRM, #SENSOR_HRM_LED_GREEN, #SENSOR_HRM_LED_IR, #SENSOR_HRM_LED_RED,
+ *          #SENSOR_HUMAN_PEDOMETER, #SENSOR_HUMAN_SLEEP_MONITOR, #SENSOR_HUMAN_SLEEP_DETECTOR,
+ *          and #SENSOR_HUMAN_STRESS_MONITOR.
+ *
+ * @param[in]  type        Sensor type
+ * @param[in]  query       Query handle
+ * @param[in]  cb          Callback function to receive the queried data
+ * @param[in]  user_data   User data to be passed to the callback function
+ *
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_NOT_SUPPORTED        Not supported to record the sensor type
+ * @retval  #SENSOR_ERROR_PERMISSION_DENIED    Permission denied
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ *
+ * @see     sensor_recorder_read_sync()
+ */
+int sensor_recorder_read(sensor_type_e type, sensor_recorder_query_h query, sensor_recorder_data_cb cb, void *user_data);
+
+/**
+ * @brief    Queries the recorded data synchronously.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ *
+ * @remarks Some sensor types are privileged. An application should have the privilege
+ *          http://tizen.org/privilege/healthinfo to get access to the following sensors:
+ *          #SENSOR_HRM, #SENSOR_HRM_LED_GREEN, #SENSOR_HRM_LED_IR, #SENSOR_HRM_LED_RED,
+ *          #SENSOR_HUMAN_PEDOMETER, #SENSOR_HUMAN_SLEEP_MONITOR, #SENSOR_HUMAN_SLEEP_DETECTOR,
+ *          and #SENSOR_HUMAN_STRESS_MONITOR.
+ *
+ * @param[in]  type        Sensor type
+ * @param[in]  query       Query handle
+ * @param[in]  cb          Callback function to receive the queried data
+ * @param[in]  user_data   User data to be passed to the callback function
+ *
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_NOT_SUPPORTED        Not supported to record the sensor type
+ * @retval  #SENSOR_ERROR_PERMISSION_DENIED    Permission denied
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ * @retval  #SENSOR_ERROR_NO_DATA              No data retrieved
+ *
+ * @see     sensor_recorder_read()
+ */
+int sensor_recorder_read_sync(sensor_type_e type, sensor_recorder_query_h query, sensor_recorder_data_cb cb, void *user_data);
+
+/**
+ * @brief    Gets the start and the end time of the time period of a given record data.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ *
+ * @param[in]  data        Record data handle
+ * @param[out] start_time  Start time of the time period of the record
+ * @param[out] end_time    End time of the time period of the record
+ *
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ */
+int sensor_recorder_data_get_time(sensor_recorder_data_h data, time_t *start_time, time_t *end_time);
+
+/**
+ * @brief    Gets an integer value from a record data.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ *
+ * @param[in]  data        Record data handle
+ * @param[in]  key         Data attribute to retrieve
+ * @param[out] value       Retrieved value
+ *
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ * @retval  #SENSOR_ERROR_NO_DATA              No data retrieved
+ */
+int sensor_recorder_data_get_int(sensor_recorder_data_h data, sensor_recorder_data_e key, int *value);
+
+/**
+ * @brief    Gets a double value from a record data.
+ * @since_tizen @if MOBILE 3.0 @elseif WEARABLE 2.3.2 @endif
+ *
+ * @param[in]  data        Record data handle
+ * @param[in]  key         Data attribute to retrieve
+ * @param[out] value       Retrieved value
+ *
+ * @return  #SENSOR_ERROR_NONE on success, otherwise a negative error value
+ * @retval  #SENSOR_ERROR_NONE                 Successful
+ * @retval  #SENSOR_ERROR_INVALID_PARAMETER    Invalid parameter
+ * @retval  #SENSOR_ERROR_OPERATION_FAILED     Operation failed
+ * @retval  #SENSOR_ERROR_NO_DATA              No data retrieved
+ */
+int sensor_recorder_data_get_double(sensor_recorder_data_h data, sensor_recorder_data_e key, double *value);
 
 /**
  * @}

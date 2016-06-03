@@ -57,6 +57,7 @@
  *  - http://tizen.org/feature/sensor.geomagnetic_rotation_vector\n
  *  - http://tizen.org/feature/sensor.pedometer\n
  *  - http://tizen.org/feature/sensor.sleep_monitor\n
+ *  - http://tizen.org/feature/sensor.stress_monitor\n
  *
  * It is recommended to design feature related codes in your application for reliability.\n
  *
@@ -81,11 +82,25 @@
  * device.  A variety of hardware/virtual sensors are typically available on
  * mobile devices.
  *
-*/
+ */
+
+ /**
+ * @ingroup CAPI_SYSTEM_SENSOR_MODULE
+ * @defgroup CAPI_SYSTEM_SENSOR_RECORDER_MODULE Sensor Recorder
+ * @brief The @ref CAPI_SYSTEM_SENSOR_RECORDER_MODULE API provides functions to start/stop recording sensor events and read the recorded data.
+ *
+ * @section CAPI_SYSTEM_SENSOR_RECORDER_MODULE_HEADER Required Header
+ *   \#include <sensor.h>
+ *
+ * @section CAPI_SYSTEM_SENSOR_MODULE_OVERVIEW Overview
+ * This Sensor API provides functions to record sensors events in the device.
+ * Several sensors are typically available on mobile devices.
+ *
+ */
 
 /**
  * @ingroup CAPI_SYSTEM_SENSOR_MODULE
- * @defgroup CAPI_SYSTEM_SENSOR_UTILITY_MODULE Utility
+ * @defgroup CAPI_SYSTEM_SENSOR_UTILITY_MODULE Sensor Utility
  * @brief The @ref CAPI_SYSTEM_SENSOR_UTILITY_MODULE API provides utility functions.
  *
  * @section CAPI_SYSTEM_SENSOR_UTILITY_MODULE_HEADER Required Header
