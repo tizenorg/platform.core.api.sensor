@@ -49,6 +49,10 @@
 
 #define CONVERT_AXIS_ENUM(X) ((X) < 3 ? (X) + 0x81 : (X) - 2)
 
+#define CONVERT_OPTION_PAUSE_POLICY(option) \
+	(option == SENSOR_OPTION_DEFAULT || option == SENSOR_OPTION_ALWAYS_ON) ? \
+	(option ^ 0b11) : option
+
 static int sensor_connect(sensor_h sensor, sensor_listener_h listener)
 {
 	int id = SENSOR_UNDEFINED_ID;
@@ -255,7 +259,7 @@ int sensor_create_listener(sensor_h sensor, sensor_listener_h *listener)
 	}
 
 	_listener->sensor = sensor;
-	_listener->option = SENSOR_OPTION_DEFAULT;
+	_listener->pause = SENSOR_PAUSE_ALL;
 	_listener->batch_latency = SENSOR_BATCH_LATENCY_DEFAULT;
 	_listener->magic = SENSOR_LISTENER_MAGIC;
 
@@ -289,7 +293,7 @@ int sensor_destroy_listener(sensor_listener_h listener)
 int sensor_listener_start(sensor_listener_h listener)
 {
 	int id;
-	unsigned int option = 0;
+	unsigned int pause = SENSOR_PAUSE_ALL;
 
 	_D("called sensor_listener_start : listener[0x%x]", listener);
 
@@ -300,9 +304,12 @@ int sensor_listener_start(sensor_listener_h listener)
 		return SENSOR_ERROR_INVALID_PARAMETER;
 
 	id = listener->id;
-	option = listener->option;
+	pause = listener->pause;
 
-	if (!sensord_start(id, option))
+	if (!sensord_start(id, 0))
+		return SENSOR_ERROR_OPERATION_FAILED;
+
+	if (sensord_set_attribute_int(id, SENSOR_ATTRIBUTE_PAUSE_POLICY, pause) < 0)
 		return SENSOR_ERROR_OPERATION_FAILED;
 
 	_D("success sensor_listener_start : id[%d]", id);
@@ -566,7 +573,7 @@ int sensor_listener_set_attribute_int(sensor_listener_h listener, sensor_attribu
 		return SENSOR_ERROR_OPERATION_FAILED;
 
 	if (attribute == SENSOR_ATTRIBUTE_PAUSE_POLICY)
-		listener->option = value;
+		listener->pause = value;
 
 	_D("success sensor_set_attribute_int");
 
@@ -587,10 +594,10 @@ int sensor_listener_set_option(sensor_listener_h listener, sensor_option_e optio
 
 	id = listener->id;
 
-	if (!sensord_set_option(id, (int)option))
+	if (sensord_set_attribute_int(id, SENSOR_ATTRIBUTE_PAUSE_POLICY, CONVERT_OPTION_PAUSE_POLICY(option)) < 0)
 		return SENSOR_ERROR_OPERATION_FAILED;
 
-	listener->option = option;
+	listener->pause = CONVERT_OPTION_PAUSE_POLICY(option);
 
 	_D("success sensor_set_option");
 
