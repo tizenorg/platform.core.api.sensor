@@ -832,7 +832,7 @@ int sensor_util_get_rotation_matrix_from_vector(float Vx, float Vy, float Vz, fl
 	return SENSOR_ERROR_NONE;
 }
 
-int sensor_util_get_rotation_matrix(float Gx, float Gy, float Gz,float Mx, float My, float Mz, float R[], float I[])
+int sensor_util_get_rotation_matrix(float Gx, float Gy, float Gz, float Mx, float My, float Mz, float R[], float I[])
 {
 	float G[3] = {Gx, Gy, Gz};
 	float M[3] = {Mx, My, Mz};
