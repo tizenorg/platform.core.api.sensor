@@ -175,13 +175,13 @@ typedef enum
 	SENSOR_ULTRAVIOLET,                     /**< Ultraviolet sensor */
 	SENSOR_TEMPERATURE,                     /**< Temperature sensor */
 	SENSOR_HUMIDITY,                        /**< Humidity sensor */
-	SENSOR_HRM,                             /**< Heart-rate monitor (Since 2.3.1)
+	SENSOR_HRM,                             /**< Heart-rate monitor @if MOBILE (Since 2.3.1) @endif
 	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
-	SENSOR_HRM_LED_GREEN,                   /**< Green LED sensor of HRM (Since 2.3.1)
+	SENSOR_HRM_LED_GREEN,                   /**< Green LED sensor of HRM @if MOBILE (Since 2.3.1) @endif
 	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
-	SENSOR_HRM_LED_IR,                      /**< Infra-Red LED sensor of HRM (Since 2.3.1)
+	SENSOR_HRM_LED_IR,                      /**< Infra-Red LED sensor of HRM @if MOBILE (Since 2.3.1) @endif
 	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
-	SENSOR_HRM_LED_RED,                     /**< Red LED sensor of HRM (Since 2.3.1)
+	SENSOR_HRM_LED_RED,                     /**< Red LED sensor of HRM @if MOBILE (Since 2.3.1) @endif
 	                                             @n Privilege : http://tizen.org/privilege/healthinfo */
 	SENSOR_GYROSCOPE_UNCALIBRATED,          /**< Uncalibrated Gyroscope sensor
 	                                             @if MOBILE (Since 2.4) @elseif WEARABLE (Since 3.0) @endif */
