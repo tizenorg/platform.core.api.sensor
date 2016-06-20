@@ -25,7 +25,7 @@
 #include <sensor_private.h>
 #include <libgen.h>
 #include <memory>
-#include <sensor_log.h>
+#include "include/sensor_log.h"
 
 #define RETURN_VAL_IF(expr, err) \
 	do { \
