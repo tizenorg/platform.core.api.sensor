@@ -20,7 +20,7 @@
 struct sensor_listener_s {
 	int id;
 	int type;
-	int option;
+	int pause;
 	unsigned int batch_latency;
 	unsigned int magic;
 	void *sensor;
