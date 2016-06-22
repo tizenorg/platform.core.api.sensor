@@ -49,9 +49,7 @@
 
 #define CONVERT_AXIS_ENUM(X) ((X) < 3 ? (X) + 0x81 : (X) - 2)
 
-#define CONVERT_OPTION_PAUSE_POLICY(option) \
-	(option == SENSOR_OPTION_DEFAULT || option == SENSOR_OPTION_ALWAYS_ON) ? \
-	(option ^ 0b11) : option
+#define CONVERT_OPTION_PAUSE_POLICY(option) ((option) ^ 0b11)
 
 static int sensor_connect(sensor_h sensor, sensor_listener_h listener)
 {
