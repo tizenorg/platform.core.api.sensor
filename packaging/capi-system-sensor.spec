@@ -10,6 +10,7 @@ BuildRequires:  cmake
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(sensor)
 BuildRequires:  pkgconfig(capi-base-common)
+BuildRequires:  pkgconfig(context-common)
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 
