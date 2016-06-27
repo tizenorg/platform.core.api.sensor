@@ -21,6 +21,7 @@
 #include <ErrorTypes.h>
 #include <DBusClient.h>
 #include <ProviderTypes.h>
+#include <SensorRecorderTypes.h>
 #include <ScopeMutex.h>
 #include <map>
 #include <string>
