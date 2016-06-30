@@ -1,6 +1,6 @@
 Name:       capi-system-sensor
 Summary:    A Sensor library in TIZEN C API
-Version:    0.2.2
+Version:    0.2.3
 Release:    0
 Group:      System/API
 License:    Apache-2.0 and PD
@@ -10,6 +10,7 @@ BuildRequires:  cmake
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(sensor)
 BuildRequires:  pkgconfig(capi-base-common)
+BuildRequires:  pkgconfig(context-common)
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 

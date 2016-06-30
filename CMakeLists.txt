@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 PROJECT(capi-system-sensor)
 INCLUDE(GNUInstallDirs)
 
-SET(DEPENDENTS "dlog sensor capi-base-common")
+SET(DEPENDENTS "dlog sensor capi-base-common context-common")
 SET(VERSION ${FULLVER})
 SET(PREFIX ${CMAKE_INSTALL_PREFIX})
 
