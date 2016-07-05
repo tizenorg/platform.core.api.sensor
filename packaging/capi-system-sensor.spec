@@ -6,11 +6,15 @@ Group:      System/API
 License:    Apache-2.0 and PD
 Source0:    %{name}-%{version}.tar.gz
 
+%define BUILD_PROFILE %{?profile}%{!?profile:%{?tizen_profile_name}}
+
 BuildRequires:  cmake
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(sensor)
 BuildRequires:  pkgconfig(capi-base-common)
+%if "%{?BUILD_PROFILE}" == "mobile" || "%{?BUILD_PROFILE}" == "wearable"
 BuildRequires:  pkgconfig(context-common)
+%endif
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 
@@ -31,7 +35,7 @@ A Sensor library in TIZEN C API package (Development).
 
 %build
 MAJORVER=`echo %{version} | awk 'BEGIN {FS="."}{print $1}'`
-%cmake . -DFULLVER=%{version} -DMAJORVER=${MAJORVER}
+%cmake . -DFULLVER=%{version} -DMAJORVER=${MAJORVER} -DPROFILE=%{BUILD_PROFILE}
 %__make %{?_smp_mflags}
 
 %install
