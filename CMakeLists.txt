@@ -2,7 +2,12 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 PROJECT(capi-system-sensor)
 INCLUDE(GNUInstallDirs)
 
-SET(DEPENDENTS "dlog sensor capi-base-common context-common")
+SET(DEPENDENTS "dlog sensor capi-base-common")
+
+IF("${PROFILE}" STREQUAL "mobile" OR "${PROFILE}" STREQUAL "wearable")
+	SET(DEPENDENTS ${DEPENDENTS} "context-common")
+ENDIF()
+
 SET(VERSION ${FULLVER})
 SET(PREFIX ${CMAKE_INSTALL_PREFIX})
 
@@ -31,8 +36,18 @@ SET(CMAKE_EXE_LINKER_FLAGS "-Wl,--as-needed -Wl, --rpath=${LIB_INSTALL_DIR}")
 # Internal Logging Option
 #ADD_DEFINITIONS("-DTIZEN_DEBUG")
 
-# Complile Source files
-AUX_SOURCE_DIRECTORY(src SOURCES)
+# Compile Source files
+SET(SRC_FILES src/geomagnetic_field.c
+              src/fusion_util.c
+			  src/sensor.cpp)
+
+IF("${PROFILE}" STREQUAL "mobile" OR "${PROFILE}" STREQUAL "wearable")
+	SET(SRC_FILES ${SRC_FILES} src/sensor_recorder.cpp)
+ELSE()
+	SET(SRC_FILES ${SRC_FILES} src/sensor_recorder_dummy.cpp)
+ENDIF()
+
+FILE(GLOB SOURCES ${SRC_FILES})
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCES})
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${${PROJECT_NAME}_LDFLAGS})
