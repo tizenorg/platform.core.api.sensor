@@ -5,7 +5,7 @@ INCLUDE(GNUInstallDirs)
 SET(DEPENDENTS "dlog sensor capi-base-common")
 
 IF("${PROFILE}" STREQUAL "mobile" OR "${PROFILE}" STREQUAL "wearable")
-	SET(DEPENDENTS ${DEPENDENTS} "context-common")
+	SET(DEPENDENTS "${DEPENDENTS} context-common")
 ENDIF()
 
 SET(VERSION ${FULLVER})
