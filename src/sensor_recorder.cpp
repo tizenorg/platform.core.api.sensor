@@ -290,6 +290,8 @@ int sensor_recorder_query_set_int(sensor_recorder_query_h query, sensor_recorder
 		return SENSOR_ERROR_INVALID_PARAMETER;
 	if (query_keys.find(attribute) == query_keys.end())
 		return SENSOR_ERROR_INVALID_PARAMETER;
+	if (attribute == SENSOR_RECORDER_QUERY_TIME_INTERVAL && value < 0)
+		return SENSOR_ERROR_INVALID_PARAMETER;
 
 	static_cast<ctx::Json *>(query)->set(NULL, query_keys[attribute].c_str(), (int)value);
 
@@ -300,14 +302,26 @@ int sensor_recorder_query_set_int(sensor_recorder_query_h query, sensor_recorder
 
 int sensor_recorder_query_set_time(sensor_recorder_query_h query, sensor_recorder_query_e attribute, time_t t)
 {
+	ctx::Json *time_query = static_cast<ctx::Json *>(query);
+	int64_t endTime;
+	int64_t startTime;
+
 	if (!query)
 		return SENSOR_ERROR_INVALID_PARAMETER;
 	if (attribute < 0)
 		return SENSOR_ERROR_INVALID_PARAMETER;
 	if (query_keys.find(attribute) == query_keys.end())
 		return SENSOR_ERROR_INVALID_PARAMETER;
+	if (t < 0)
+		return SENSOR_ERROR_INVALID_PARAMETER;
+	if (time_query->get(NULL, KEY_END_TIME, &endTime))
+		if (attribute == SENSOR_RECORDER_QUERY_START_TIME && t >= endTime)
+			return SENSOR_ERROR_INVALID_PARAMETER;
+	if (time_query->get(NULL, KEY_START_TIME, &startTime))
+		if (attribute == SENSOR_RECORDER_QUERY_END_TIME && t <= startTime)
+			return SENSOR_ERROR_INVALID_PARAMETER;
 
-	static_cast<ctx::Json *>(query)->set(NULL, query_keys[attribute].c_str(), (int64_t)t);
+	time_query->set(NULL, query_keys[attribute].c_str(), (int64_t)t);
 
 	_D("Set attribute[%d] with value[%ld] to query[%p]", attribute, t, query);
 
